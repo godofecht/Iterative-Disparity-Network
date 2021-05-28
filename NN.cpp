@@ -43,7 +43,7 @@ void Neuron::feedForwardHidden(Layer &prevLayer) //Hidden Layer Activations
 	}
 
 
-	m_outputVal =  Neuron::transferFunction(sum+1.0);
+	m_outputVal =  Neuron::transferFunction(sum);
 }
 
 
@@ -56,14 +56,12 @@ void Neuron::updateInputWeights(Layer &prevLayer) //Formulas adapted into code.
 
 		double newDeltaWeight =
 			// Individual input is magnified by the gradient and train rate:
-			0.001 //No learning rate because F adjusts it automatically
+			0.10 //No learning rate because F adjusts it automatically
 			* m_outputVal
 			* m_gradient;
 						// Also adding momentum = a fraction of the previous delta weight;
-//			+ 0.1
-//			* oldDeltaWeight;
 
-		cout<<newDeltaWeight<<endl;
+//		cout<<newDeltaWeight<<endl;
 
 //		if(isnan(newDeltaWeight)) newDeltaWeight = 0.0;
 

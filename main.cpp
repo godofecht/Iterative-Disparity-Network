@@ -4,7 +4,7 @@
 using namespace std;
 
 
-int NUM_EPOCHS = 100;
+int NUM_EPOCHS = 1000;
 
 int main()
 {
@@ -14,7 +14,8 @@ int main()
 
     for(int i=0;i<NUM_EPOCHS;i++)
     {
-     //   cout<<i<<endl;
+        if(i %10 == 0)
+            cout<<i<<endl;
         dNet.Train(i);
     }
 

@@ -129,32 +129,50 @@ public:
             inputVector.clear();
             inputVector = getInputVector(image1, image2, a);
 
-     //    for(int i=0;i<10;i++)
-     //    {
-     //        inputVector.push_back(0.01);
-      //   }
+    //     for(int i=0;i<10;i++)
+    //     {
+    //         inputVector.push_back(0.5);
+    //     } inputVector.push_back(-1.0);
+
+
             feedforward(inputVector); //feeds inputs through , propagates and sets neuronal output values for calculation of V and U
             getNetwork()->Output_Array[a]=(GetResult()[0]);
 
             getNetwork()->y_old = getNetwork()->y;
             getNetwork()->y = GetResult()[0];
 
-            getNetwork()->CalcU();
-            getNetwork()->CalcV();
+        //    getNetwork()->CalcU();
+        //    getNetwork()->CalcV();
         //    getNetwork()->CalcF();
         //    getNetwork()->CalcFDerivative();
 
-            getNetwork()->calcIncrementedAverages();
+        //    getNetwork()->calcIncrementedAverages();
 
 
 
-            dispVec1.clear();
-            dispVec1.push_back(disparityVector[a*7 + 4]);
-        //    cout<<dispVec1[0];
-            error = sqrt(pow((GetResult()[0] - dispVec1[0]), 2.0));
+  //          dispVec1.clear();
+  //          dispVec1.push_back(disparityVector[a*7]);
+            error = pow((getNetwork()->y - disparityVector[a*7 + 2]), 2.0);
          //   error = getNetwork()->F;
+
+
+
             getNetwork()->backPropagate(error);
             error = 0.0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -187,7 +205,7 @@ public:
         */
 
         }
-     //   cout<<error<<endl;
+
 
     }
 
