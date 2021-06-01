@@ -7,8 +7,12 @@ Network::Network(const vector <unsigned> &topology)
 	srand((unsigned int)time(NULL));
 
 	unsigned numLayers = topology.size();
+
+//	int num_layers = 0;
 	for (unsigned layerNum = 0; layerNum < numLayers; layerNum++) {
 		m_layers.push_back(Layer());
+//		num_layers++;
+//		cout<<num_layers<<endl;
 		unsigned numOutputs;
 		if(layerNum == topology.size()-1)
 			numOutputs = 0;
@@ -16,7 +20,10 @@ Network::Network(const vector <unsigned> &topology)
 			numOutputs = topology[layerNum+1];// layerNum == topology.size() - 1 ? 0 : topology[layerNum + 1];
 
 		// We have a new layer, now fill it with neurons
+		int num_neurons = 0;
 		for (unsigned neuronNum = 0; neuronNum < topology[layerNum]; neuronNum++) {
+			num_neurons++;
+			cout<<num_neurons<<endl;
 			m_layers.back().push_back(Neuron(numOutputs, neuronNum));
 	//		cout<<neuronNum<<" "<<numOutputs<<endl;
 		}
@@ -71,7 +78,57 @@ void Network::CalcFDerivative()
 //	FDeriv = 1.0/V * dvdw - 1.0/U * dudw;
 }
 
+void Network::backPropagate(const vector <double> &targetVals)
+{
+	// Calculate overall net error (RMS of output neuron errors)
 
+	Layer &outputLayer = m_layers.back();
+	Layer &hiddenLayer = m_layers[1];
+	Layer &inputLayer = m_layers[0];
+
+	m_error = 0.0;
+
+	for (unsigned n = 0; n < outputLayer.size() - 1; ++n) {
+		double delta = targetVals[n] - outputLayer[n].getOutputVal();
+		m_error += delta * delta;
+	}
+	m_error /= outputLayer.size() - 1; // get average error squared
+	m_error = sqrt(m_error); // RMS
+
+	// Implement a recent average measurement
+
+	m_recentAverageError =
+		(m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
+		/ (m_recentAverageSmoothingFactor + 1.0);
+
+	// Calculate output layer gradients
+
+	for (unsigned n = 0; n < outputLayer.size(); n++) {
+		outputLayer[n].calcOutputGradients(targetVals[n]);
+	}
+
+	// Calculate hidden layer gradients
+	for (unsigned n = 0; n < hiddenLayer.size(); n++) 
+	{
+		hiddenLayer[n].calcHiddenGradients(outputLayer);
+	}
+	for (unsigned n = 0; n < inputLayer.size(); n++) 
+	{
+		inputLayer[n].calcInputGradients(hiddenLayer);
+	}
+
+	// For all layers from outputs to first hidden layer,
+	// update connection weights
+
+	for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; --layerNum) {
+		Layer &layer = m_layers[layerNum];
+		Layer &prevLayer = m_layers[layerNum - 1];
+
+		for (unsigned n = 0; n < layer.size() - 1; ++n) {
+			layer[n].updateInputWeights(prevLayer);
+		}
+	}
+}
 
 void Network::backPropagate(double m_error)
 {
@@ -166,6 +223,7 @@ void  Network::getResults(vector <double> &resultVals)
 	}
 }
 
+/*
 void Network::PutWeights(vector<double> &weights)
 {
 	int cWeight = 0.0;
@@ -175,11 +233,46 @@ void Network::PutWeights(vector<double> &weights)
 		//for each neuron
 		for (int j = 0; j<m_layers[i].size(); j++)
 		{
-			//for each weight
+			//for each weight (first 11 weights)
 			for (int k = 0; k<m_layers[i][j].m_outputWeights.size(); k++)
 			{
 				m_layers[i][j].m_outputWeights[k].weight = weights[cWeight++];
 			}
 		}
 	}
+}
+*/
+
+void Network::PutWeights(vector<double> &weights)
+{
+	Layer &outputLayer = m_layers.back();
+	Layer &hiddenLayer = m_layers[1];
+	Layer &inputLayer = m_layers[0];
+
+
+ 	//iterate through hidden layers, taking 1st output of 1st layer
+
+
+	int weightcounter = 0;
+
+
+	for (int h = 0; h < hiddenLayer.size(); h++)
+	{
+		for (int i = 0; i < inputLayer.size(); i++)
+		{
+			inputLayer[i].m_outputWeights[h].weight = weights[weightcounter];
+			weightcounter++;
+
+		}
+	}
+	for(int j=0;j<hiddenLayer.size();j++)
+	{
+		hiddenLayer[j].m_outputWeights[0].weight = weights[weightcounter];
+		weightcounter++;
+	}
+	
+
+	//iterate through weights from hidden layer to single output
+
+
 }

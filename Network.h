@@ -10,58 +10,9 @@ public:
 	Network(const vector<unsigned> &topology);
 	//	void backPropagate(const vector <double> &targetVals);
 	void backPropagate(double m_error);
-
-	void backPropagate(const vector<double> &targetVals)
-	{
-		// Calculate overall net error (RMS of output neuron errors)
+	void backPropagate(const vector <double> &targetVals);
 
 
-		Layer &outputLayer = m_layers.back();
-		Layer &hiddenLayer = m_layers[1];
-		Layer &inputLayer = m_layers[0];
-		m_error = 0.0;
-
-		double delta = targetVals[0] - outputLayer[0].getOutputVal();
-		m_error += delta * delta;
-
-		m_error = sqrt(m_error);		   // RMS
-	//	cout<<outputLayer[0].getOutputVal()<<endl;
-
-		// Implement a recent average measurement
-
-		m_recentAverageError =
-			(m_recentAverageError * m_recentAverageSmoothingFactor + m_error) / (m_recentAverageSmoothingFactor + 1.0);
-
-		// Calculate output layer gradients
-
-
-
-		// Calculate output layer gradients
-		for (unsigned n = 0; n < outputLayer.size(); n++)
-		{
-			outputLayer[n].calcOutputGradients(m_error);
-		}
-		// Calculate hidden layer gradients
-		for (unsigned n = 0; n < hiddenLayer.size(); n++)
-		{
-			hiddenLayer[n].calcHiddenGradients(outputLayer);
-		}
-		for (unsigned n = 0; n < inputLayer.size(); n++)
-		{
-			inputLayer[n].calcInputGradients(hiddenLayer);
-		}
-		// For all layers from outputs to first hidden layer,
-		//5. Calculate weight changes for all weights
-		for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; layerNum--)
-		{
-			Layer &layer = m_layers[layerNum];
-			Layer &prevLayer = m_layers[layerNum - 1];
-			for (unsigned n = 0; n < layer.size(); n++)
-			{
-				layer[n].updateInputWeights(prevLayer);
-			}
-		}
-	}
 	void feedForward(vector<double> &inputVals);
 	void getResults(vector<double> &resultVals);
 	double getRecentAverageError(void) const { return m_recentAverageError; }
@@ -218,6 +169,7 @@ public:
 		return kernelU;
 	}
 
+
 	//fix masks
 	vector<double> getConvolutionalMaskV(double h)
 	{
@@ -264,6 +216,11 @@ public:
 			w = A / 2.0 - 1.0;
 		}
 		return w;
+	}
+
+	double getF()
+	{
+		return log(V/U);
 	}
 
 	void normalizeVector(vector<double> &vec)

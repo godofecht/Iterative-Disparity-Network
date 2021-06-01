@@ -43,7 +43,6 @@ public:
 	vector <connection> m_outputWeights;
 
 
-
 	int getIndex();
 
     double UpdateYBar();

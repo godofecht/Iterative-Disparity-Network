@@ -42,6 +42,9 @@ public:
 		thisNetwork->backPropagate(targetVals);
 	}
 	*/
+
+
+
 	Network* getNetwork()
 	{
 		return thisNetwork;

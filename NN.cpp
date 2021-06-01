@@ -56,7 +56,7 @@ void Neuron::updateInputWeights(Layer &prevLayer) //Formulas adapted into code.
 
 		double newDeltaWeight =
 			// Individual input is magnified by the gradient and train rate:
-			0.10 //No learning rate because F adjusts it automatically
+			0.0001 //No learning rate because F adjusts it automatically
 			* m_outputVal
 			* m_gradient;
 						// Also adding momentum = a fraction of the previous delta weight;
@@ -64,6 +64,7 @@ void Neuron::updateInputWeights(Layer &prevLayer) //Formulas adapted into code.
 //		cout<<newDeltaWeight<<endl;
 
 //		if(isnan(newDeltaWeight)) newDeltaWeight = 0.0;
+//		cout<<newDeltaWeight<<endl;
 
 		neuron.m_outputWeights[m_myIndex].deltaweight = newDeltaWeight;
 		neuron.m_outputWeights[m_myIndex].weight += newDeltaWeight;
@@ -78,9 +79,6 @@ void Neuron::setOutputVal(double n)
 {
 	m_outputVal = n;
 }
-
-
-
 double Neuron::randomWeight()
 {
 		return (double(rand()) / double(RAND_MAX));
@@ -109,10 +107,6 @@ int Neuron::getIndex()
 {
 	return m_myIndex;
 }
-
-
-
-
 void Neuron::calcHiddenGradients(const Layer &nextLayer)
 {
 	double dow = sumDOW(nextLayer);
@@ -128,6 +122,8 @@ void Neuron::calcInputGradients(const Layer &nextLayer)
 	m_gradient = dow*derivative;
 }
 
+
+/*
 void Neuron::calcOutputGradients(double error) //Looks at the difference between the target values and the output values.
 {
 	double delta = error;
@@ -136,4 +132,13 @@ void Neuron::calcOutputGradients(double error) //Looks at the difference between
 	m_gradient = delta * 1.0;
 
 }
+*/
 
+void Neuron::calcOutputGradients(double targetVal)
+{
+	double delta = targetVal - m_outputVal;
+	m_gradient = delta * 1.0;
+
+
+//	cout<<m_gradient<<endl;
+}
