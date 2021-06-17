@@ -69,7 +69,7 @@ public:
 			y_bar = 0.0;
 		if (isnan(y))
 			y = 0.0;
-		double vdiff = 0.5 * pow(y_bar - y, 2.0);
+		double vdiff = 0.5 * (y_bar - y) * (dzbdw - dzdw);
 		if (isnan(vdiff))
 			vdiff = 0.0;
 		V += vdiff;
@@ -77,19 +77,129 @@ public:
 
 	void CalcU()
 	{
-		double udiff = 0.5 * pow(y_tilde - y, 2.0);
+		double udiff = 0.5 * (y_tilde - y) * (dztdw - dzdw);
 
 		U += udiff;
 	}
 
-	void Calcdztdw()
+	double calcDUDW()
+	{
+		dudw += (y_tilde - y) * (dztdw - dzdw);
+	}
+
+	double calcDVDW()
+	{
+		dvdw += (y_bar - y) * (dzbdw - dzdw);
+	}
+
+	void Calcdztdw() //Equation A8
 	{
 		dztdw = lambda_s * dztdw + (1.0 - lambda_s) * y;
 	}
 
-	void Calcdzbdw()
+	void Calcdzbdw() //Equation A8
 	{
 		dzbdw = lambda_l * dzbdw + (1.0 - lambda_l) * y;
+	}
+
+	void CalcDUDWHidden()
+	{
+
+	}
+
+	void CalcDVDWHidden()
+	{
+		
+	}
+
+	vector<double> GetNeuronOutputsVector()
+	{
+		vector<double> output_values; //of all neurons
+		for (int i = 0; i < m_layers.size(); i++)
+		{
+			//for each neuron
+			for (int j = 0; j < m_layers[i].size(); j++)
+			{
+				output_values.push_back(m_layers[i][j].getOutputVal());
+			}
+		}
+		return output_values;
+	}
+
+	vector<double> GetNeuronOutputsOldVector()
+	{
+		vector<double> output_values; //of all neurons
+		for (int i = 0; i < m_layers.size(); i++)
+		{
+			//for each neuron
+			for (int j = 0; j < m_layers[i].size(); j++)
+			{
+				output_values.push_back(m_layers[i][j].getOldOutputVal());
+			}
+		}
+		return output_values;
+	}
+
+
+	void ComputeAllNeuronalAverages()
+	{
+		for (int i = 0; i < m_layers.size(); i++)
+		{
+			//for each neuron
+			for (int j = 0; j < m_layers[i].size(); j++)
+			{
+				m_layers[i][j].computeAverages();
+			}
+		}
+	}
+
+
+	vector<double> hiddenLayerWeights;
+	vector<double> hiddenLayerOutputs;
+	vector<double> hiddenLayerOldOutputs;
+
+
+	void ComputeUVDerivatives()
+	{
+
+
+		hiddenLayerWeights.clear();
+		hiddenLayerOutputs.clear();
+		hiddenLayerOldOutputs.clear();
+
+		for (int j = 0; j < m_layers[1].size(); j++)
+		{
+			m_layers[1][j].UpdateUVHidden(y, y_tilde, y_bar,y_tilde_old,y_bar_old);
+			m_layers[1][j].ComputeFDerivative(U, V);
+		}
+
+		//for each neuron
+		for (int j = 0; j < m_layers[0].size(); j++)
+		{
+			for(int k=0;k<m_layers[1].size();k++)
+			{
+				hiddenLayerWeights.push_back(m_layers[1][k].m_outputWeights[0].weight);
+				hiddenLayerOutputs.push_back(m_layers[1][k].getOutputVal());
+				hiddenLayerOldOutputs.push_back(m_layers[1][k].getOldOutputVal());
+			}
+
+			m_layers[0][j].UpdateUVInput(y, y_tilde, y_bar,y_tilde_old,y_bar_old,hiddenLayerWeights,hiddenLayerOldOutputs,hiddenLayerOutputs);
+			m_layers[0][j].ComputeFDerivative(U, V);
+			//		cout<<m_layers[i][j].m_outputWeights[0].F<<endl;
+		}
+	}
+
+	void UpdateNeuronWeights_bray1996(double learning_rate)
+	{
+		for (int i = 0; i < m_layers.size(); i++)
+		{
+			//for each neuron
+			for (int j = 0; j < m_layers[i].size(); j++)
+			{
+				for(int k=0;k<m_layers[i][j].m_outputWeights.size();k++)
+					m_layers[i][j].m_outputWeights[k].weight += learning_rate * m_layers[i][j].m_outputWeights[k].DFDW;
+			}
+		}
 	}
 
 	void CalcF();
@@ -106,28 +216,26 @@ public:
 	double zjt; //This is effectively the output
 	double zkt; //These are hidden layer units
 
+
+	double y_tilde_old = 0.0;
+	double y_bar_old = 0.0;
+
 	void calcIncrementedAverages()
 	{
+		y_tilde_old = y_tilde;
+		y_bar_old = y_bar;
 		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y;
 		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y;
-		dzdw = y; //PRT maybe take it out
-		calcDUDW();
-		calcDVDW();
+	//	dzdw = y; //PRT maybe take it out
+	//	calcDUDW();
+	//	calcDVDW();
 	}
 
 	double calczjt()
 	{
 	}
 
-	double calcDUDW()
-	{
-		dudw += (y_tilde - y) * (dztdw - dzdw);
-	}
 
-	double calcDVDW()
-	{
-		dvdw += (y_bar - y) * (dzbdw - dzdw);
-	}
 
 	double getErrorDerivative(double dvdx, double dudx); //technically merit derivative because dFdX = -dEdX
 

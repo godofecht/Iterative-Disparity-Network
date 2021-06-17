@@ -4,7 +4,7 @@
 using namespace std;
 
 
-int NUM_EPOCHS = 10000;
+int NUM_EPOCHS = 1000;
 
 int main()
 {

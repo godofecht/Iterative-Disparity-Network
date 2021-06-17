@@ -23,14 +23,14 @@ Network::Network(const vector <unsigned> &topology)
 		int num_neurons = 0;
 		for (unsigned neuronNum = 0; neuronNum < topology[layerNum]; neuronNum++) {
 			num_neurons++;
-			cout<<num_neurons<<endl;
+		//	cout<<num_neurons<<endl;
 			m_layers.back().push_back(Neuron(numOutputs, neuronNum));
 	//		cout<<neuronNum<<" "<<numOutputs<<endl;
 		}
 	}
 }
 
-double Network::getDUDX(int a)
+double Network::getDUDX(int a) //this is the same as dudw
 {
 
 }
@@ -67,10 +67,12 @@ void Network::CalcF()
 	double a = V/U;
 //	if(isnan(a)) a = 0.0;
 	F = log(a);
-//	if(isnan(F)) F = 0.0;
-	cout<<"F: "<<F<<endl;
+	cout<<F<<endl;
 //	cout<<"V: "<<V<<endl;
 //	cout<<"U: "<<U<<endl;
+
+
+
 }
 
 void Network::CalcFDerivative()
@@ -93,7 +95,7 @@ void Network::backPropagate(const vector <double> &targetVals)
 		m_error += delta * delta;
 	}
 	m_error /= outputLayer.size() - 1; // get average error squared
-	m_error = sqrt(m_error); // RMS
+	m_error = -sqrt(m_error); // RMS
 
 	// Implement a recent average measurement
 
@@ -185,6 +187,9 @@ vector<double>  Network::GetWeights() const
 	}
 	return weights;
 }
+
+
+
 
 
 

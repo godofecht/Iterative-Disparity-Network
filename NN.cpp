@@ -56,7 +56,7 @@ void Neuron::updateInputWeights(Layer &prevLayer) //Formulas adapted into code.
 
 		double newDeltaWeight =
 			// Individual input is magnified by the gradient and train rate:
-			0.0001 //No learning rate because F adjusts it automatically
+			0.00001 //No learning rate because F adjusts it automatically
 			* m_outputVal
 			* m_gradient;
 						// Also adding momentum = a fraction of the previous delta weight;
@@ -70,6 +70,10 @@ void Neuron::updateInputWeights(Layer &prevLayer) //Formulas adapted into code.
 		neuron.m_outputWeights[m_myIndex].weight += newDeltaWeight;
 	}
 }
+double Neuron::getOldOutputVal()
+{
+	return m_oldOutputVal;
+}
 
 double Neuron::getOutputVal()
 {
@@ -77,6 +81,7 @@ double Neuron::getOutputVal()
 }
 void Neuron::setOutputVal(double n)
 {
+	m_oldOutputVal = m_outputVal;
 	m_outputVal = n;
 }
 double Neuron::randomWeight()
@@ -141,4 +146,19 @@ void Neuron::calcOutputGradients(double targetVal)
 
 
 //	cout<<m_gradient<<endl;
+}
+
+
+
+
+//SFA stuff
+void Neuron::computeAverages()
+{
+	for (int i = 0; i < m_outputWeights.size(); i++)
+	{
+		m_outputWeights[i].y_bar_old = m_outputWeights[i].y_bar;
+		m_outputWeights[i].y_tilde_old = m_outputWeights[i].y_tilde;
+		m_outputWeights[i].y_tilde = (lambda_s)*m_outputWeights[i].y_tilde + (1.0 - lambda_s) * getOutputVal();
+		m_outputWeights[i].y_bar = (lambda_l)*m_outputWeights[i].y_bar + (1.0 - lambda_l) * getOutputVal();
+	}
 }
