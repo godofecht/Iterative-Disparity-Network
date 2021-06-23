@@ -67,7 +67,7 @@ void Network::CalcF()
 	double a = V/U;
 //	if(isnan(a)) a = 0.0;
 	F = log(a);
-	cout<<F<<endl;
+//	cout<<F<<endl;
 //	cout<<"V: "<<V<<endl;
 //	cout<<"U: "<<U<<endl;
 
@@ -201,6 +201,7 @@ void Network::feedForward(vector <double> &inputVals)
 	// Assign (latch) the input values into the input neurons
 	for (unsigned i = 0; i < inputVals.size(); i++) {
 		m_layers[0][i].setOutputVal(inputVals[i]);
+//		cout<<inputVals[i]<<endl;
 	}
 
 	//Feed forward from input layer to hidden layer

@@ -4,7 +4,7 @@
 using namespace std;
 
 
-int NUM_EPOCHS = 1000;
+int NUM_EPOCHS = 1;
 
 int main()
 {
@@ -14,14 +14,15 @@ int main()
 
     for(int i=0;i<NUM_EPOCHS;i++)
     {
+        dNet.Train(i);
         if(i %10 == 0)
         {
-            cout<<i<<endl;
+      //      cout<<i<<endl;
                 std::vector<std::pair<std::string,
                 std::vector<double>>> vals = {{"Values", dNet.getNetwork()->Output_Array}};
                 dNet.write_csv("outputs.csv", vals);
         }
-        dNet.Train(i);
+
     }
 
 
@@ -30,6 +31,11 @@ int main()
     std::vector<std::pair<std::string,
     std::vector<double>>> valsd = {{"Values", dNet.dispVec_to_write}};
     dNet.write_csv("disparity.csv", valsd);
+
+
+    std::vector<std::pair<std::string,
+    std::vector<double>>> valsd2 = {{"Values", dNet.getNetwork()->GetWeights()}};
+    dNet.write_csv("weights.csv", valsd2);
 
 
     return 0;

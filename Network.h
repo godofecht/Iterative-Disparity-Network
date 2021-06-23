@@ -34,9 +34,9 @@ public:
 	double F = 0.0;
 	double A = 1000.0;
 
-	double dzdw = 0.0f;
-	double dztdw = 0.0f;
-	double dzbdw = 0.0f;
+	double dzdw = 0.0;
+	double dztdw = 0.0;
+	double dzbdw = 0.0;
 
 	vector<double> dudxs;
 	vector<double> dvdxs;
@@ -65,21 +65,12 @@ public:
 	//EQN A6
 	void CalcV()
 	{
-		if (isnan(y_bar))
-			y_bar = 0.0;
-		if (isnan(y))
-			y = 0.0;
-		double vdiff = 0.5 * (y_bar - y) * (dzbdw - dzdw);
-		if (isnan(vdiff))
-			vdiff = 0.0;
-		V += vdiff;
+		V = V + 0.5 * pow(y_bar - y,2.0);
 	}
 
 	void CalcU()
 	{
-		double udiff = 0.5 * (y_tilde - y) * (dztdw - dzdw);
-
-		U += udiff;
+		U = U + 0.5 * pow(y_tilde - y,2.0);
 	}
 
 	double calcDUDW()
@@ -101,17 +92,6 @@ public:
 	{
 		dzbdw = lambda_l * dzbdw + (1.0 - lambda_l) * y;
 	}
-
-	void CalcDUDWHidden()
-	{
-
-	}
-
-	void CalcDVDWHidden()
-	{
-		
-	}
-
 	vector<double> GetNeuronOutputsVector()
 	{
 		vector<double> output_values; //of all neurons
@@ -169,19 +149,20 @@ public:
 
 		for (int j = 0; j < m_layers[1].size(); j++)
 		{
-			m_layers[1][j].UpdateUVHidden(y, y_tilde, y_bar,y_tilde_old,y_bar_old);
+			m_layers[1][j].UpdateUVHidden(y, y_tilde, y_bar, y_tilde_old, y_bar_old);
 			m_layers[1][j].ComputeFDerivative(U, V);
+		}
+
+		for (int k = 0; k < m_layers[1].size(); k++)
+		{
+			hiddenLayerWeights.push_back(m_layers[1][k].m_outputWeights[0].weight);
+			hiddenLayerOutputs.push_back(m_layers[1][k].getOutputVal());
+			hiddenLayerOldOutputs.push_back(m_layers[1][k].getOldOutputVal());
 		}
 
 		//for each neuron
 		for (int j = 0; j < m_layers[0].size(); j++)
 		{
-			for(int k=0;k<m_layers[1].size();k++)
-			{
-				hiddenLayerWeights.push_back(m_layers[1][k].m_outputWeights[0].weight);
-				hiddenLayerOutputs.push_back(m_layers[1][k].getOutputVal());
-				hiddenLayerOldOutputs.push_back(m_layers[1][k].getOldOutputVal());
-			}
 
 			m_layers[0][j].UpdateUVInput(y, y_tilde, y_bar,y_tilde_old,y_bar_old,hiddenLayerWeights,hiddenLayerOldOutputs,hiddenLayerOutputs);
 			m_layers[0][j].ComputeFDerivative(U, V);
@@ -342,6 +323,38 @@ public:
 		{
 			vec[i] /= sum;
 		}
+	}
+
+	vector<double> GetAllActivations()
+	{
+		Layer &outputLayer = m_layers.back();
+		Layer &hiddenLayer = m_layers[1];
+		Layer &inputLayer = m_layers[0];
+
+		vector<double> ActivationVector;
+
+		//iterate through hidden layers, taking 1st output of 1st layer
+
+		int weightcounter = 0;
+
+
+		for (int i = 0; i < inputLayer.size(); i++)
+		{
+			ActivationVector.push_back(inputLayer[i].getOutputVal());
+		}
+		for (int j = 0; j < hiddenLayer.size(); j++)
+		{
+			ActivationVector.push_back(hiddenLayer[j].getOutputVal());
+		}
+		for(int k=0;k<outputLayer.size();k++)
+		{
+			ActivationVector.push_back(outputLayer[k].getOutputVal());
+		}
+
+
+		return(ActivationVector);
+
+		//iterate through weights from hidden layer to single output
 	}
 
 	void CalcAverages();
