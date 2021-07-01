@@ -70,7 +70,19 @@ public:
 
 	void CalcU()
 	{
+//		cout<<"before"<<endl;
+//		printvar("U ",U);
+//		printvar("y_tilde ",y_tilde);
+//		printvar("y ",y);
 		U = U + 0.5 * pow(y_tilde - y,2.0);
+//		cout<<"after "<<endl;
+//		printvar("U",U);
+	}
+
+
+	void printvar(string a, float b)
+	{
+		cout<<a<<b<<endl;
 	}
 
 	double calcDUDW()
@@ -205,8 +217,12 @@ public:
 	{
 		y_tilde_old = y_tilde;
 		y_bar_old = y_bar;
-		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y;
-		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y;
+
+		
+		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y_old;
+		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y_old;
+
+	
 	//	dzdw = y; //PRT maybe take it out
 	//	calcDUDW();
 	//	calcDVDW();

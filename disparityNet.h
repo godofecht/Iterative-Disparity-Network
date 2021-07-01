@@ -189,6 +189,11 @@ public:
         }
     }
 
+    void PrintAllValues()
+    {
+
+    }
+
 
     void Train(int current_epoch) //in each epoch there are 1000 time steps
     {
@@ -211,8 +216,7 @@ public:
             feedforward(inputVector); //feeds inputs through , propagates and sets neuronal output values for calculation of V and U
             getNetwork()->Output_Array[a] = (GetResult()[0]);
 
-            getNetwork()->y_old = getNetwork()->y;
-            getNetwork()->y = GetResult()[0];
+
 
 
 //            getNetwork()->Calcdzbdw();
@@ -222,37 +226,69 @@ public:
 
 //getNetwork()->y = -0.09699635595318212;
 
+
+
+            getNetwork()->y_old = getNetwork()->y;
+            getNetwork()->y = GetResult()[0];
+
+            getNetwork()->calcIncrementedAverages();
+
             getNetwork()->CalcU();
             getNetwork()->CalcV();
             getNetwork()->CalcF();
+
+            getNetwork()->ComputeUVDerivatives();
+            getNetwork()->ComputeAllNeuronalAverages();
+
             
-            if (current_epoch == 0 && a == 0)
+            if (current_epoch == 10000000 && a == 0)
             {
                 
-                cout<<getNetwork()->U<<endl;
-                cout<<getNetwork()->V<<endl;
+       //         cout<<getNetwork()->U<<endl;
+        //        cout<<getNetwork()->V<<endl;
+
+                cout<<"////";
+                
     //            cout << getNetwork()->y_tilde << endl;
     //            cout << getNetwork()->y_bar << endl;
     //            cout << (getNetwork()->y)<<endl;
      //           cout << getNetwork()->U << endl;
      //           cout << getNetwork()->V << endl;
-        //        vector<double> activationVector = getNetwork()->GetAllActivations();
+                vector<double> activationVector = getNetwork()->GetAllActivations();
+
+      //          vec_display(activationVector);
+
+                cout<<"////";
+
+                cout<<"dzdw: "<<getNetwork()->dzdw<<endl;
+
+                cout<<"U: "<<getNetwork()->U << endl;
+
+                cout<<"V: "<< getNetwork()->V << endl;
+
+                cout <<"ztilde: "<< getNetwork()->y_tilde << endl;
+                
+                cout <<"zbar: "<< getNetwork()->y_bar << endl;
 
 
-       //         vec_display(activationVector);
+                cout<<"dudw: "<<getNetwork()->dudw<<endl;
+
+                cout<<"F "<< getNetwork()->F << endl;
+
+           
+                cout<<"Output"<<getNetwork()->y<<endl;
 
             }
 
 
 
-            getNetwork()->calcIncrementedAverages();
-            getNetwork()->ComputeUVDerivatives();
-            getNetwork()->ComputeAllNeuronalAverages();
+
+
 
 
 
             if(current_epoch>1)
-                getNetwork()->UpdateNeuronWeights_bray1996(0.01);
+                getNetwork()->UpdateNeuronWeights_bray1996(1.0);
             //    getNetwork()->CalcFDerivative();
 
             //          dispVec1.clear();
@@ -297,7 +333,14 @@ public:
 
 
         }
+      //      cout<<getNetwork()->F<<endl;
+    /*                  cout<<"U: "<<getNetwork()->U << endl;
 
+                cout<<"V: "<< getNetwork()->V << endl;
+    */
+        cout<<"F: "<< getNetwork()->F << endl;
+
+                
     }
 
     void write_csv(std::string filename, std::vector<std::pair<std::string, std::vector<double>>> dataset)

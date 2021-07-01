@@ -44,18 +44,20 @@ public:
 
 	void CalcdzsHidden(double zjt)
 	{
+		dzdw1 = dzdw;
 		dzdw = zjt;
 		dztdw = lambda_s * (dztdw) + (1.0 - lambda_s) * dzdw1;
 		dzbdw = lambda_l * (dzbdw) + (1.0 - lambda_l) * dzdw1;		
-		cout<<dzdw<<endl;
+//		cout<<dzdw<<endl;
 	}
 
 	void CalcdzsInput(double weight_jk, double zjt,double outputVal)
 	{
+		dzdw1 = dzdw;
 		dzdw = weight_jk * (1.0 - pow(zjt,2.0)) * outputVal;
 		dztdw = lambda_s * (dztdw) + (1.0 - lambda_s) * dzdw1;
 		dzbdw = lambda_l * (dzbdw) + (1.0 - lambda_l) * dzdw1;	
-		cout<<dzdw<<endl;	
+	//	cout<<dzdw<<endl;	
 	}
 
 	void UpdateUVHidden(double last_output,double last_output_tilde,double last_output_bar,double last_output_tilde_old,double last_output_bar_old,double oldOutputVal,double outputVal)
@@ -64,6 +66,7 @@ public:
 
 		DUDW += (last_output_tilde - last_output) * (dztdw - dzdw);// + (1.0 - lambda_s) * oldOutputVal - outputVal);
         DVDW += (last_output_bar - last_output) * (dzbdw - dzdw);// + (1.0 - lambda_l) * oldOutputVal - outputVal);
+//		cout<<DUDW<<endl;
 	}
 
 
@@ -88,14 +91,14 @@ public:
 
 		DUDW += (last_output_tilde - last_output) * (dztdw - dzdw);// + (1.0 - lambda_s) * oldOutputVal - outputVal);
         DVDW += (last_output_bar - last_output) * (dzbdw - dzdw);// + (1.0 - lambda_l) * oldOutputVal - outputVal);
-	
+	//	cout<<DUDW<<endl;
 	}
 
 	void ComputeFDerivative(double U, double V)
 	{
 		DFDW = (1.0/V * DVDW - 1.0/U * DUDW);
 		dzdw1 = dzdw;
-	//	cout<<DFDW<<endl;
+//		cout<<DFDW<<endl;
 	}
 
 
