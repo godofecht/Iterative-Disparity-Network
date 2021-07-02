@@ -68,7 +68,7 @@ public:
 
 
 
-        getNetwork()->PutWeights(weightVector0);
+        getNetwork()->PutWeights(weightVector990);
     }
 
     /*
@@ -237,11 +237,13 @@ public:
             getNetwork()->CalcV();
             getNetwork()->CalcF();
 
+
+
             getNetwork()->ComputeUVDerivatives();
             getNetwork()->ComputeAllNeuronalAverages();
 
             
-            if (current_epoch == 10000000 && a == 0)
+            if (current_epoch == 0 && a == 100000)
             {
                 
        //         cout<<getNetwork()->U<<endl;
@@ -258,37 +260,19 @@ public:
 
       //          vec_display(activationVector);
 
-                cout<<"////";
-
+                cout<<"Epoch: "<<current_epoch<<endl;
                 cout<<"dzdw: "<<getNetwork()->dzdw<<endl;
-
                 cout<<"U: "<<getNetwork()->U << endl;
-
                 cout<<"V: "<< getNetwork()->V << endl;
-
-                cout <<"ztilde: "<< getNetwork()->y_tilde << endl;
-                
+                cout <<"ztilde: "<< getNetwork()->y_tilde << endl;             
                 cout <<"zbar: "<< getNetwork()->y_bar << endl;
-
-
-                cout<<"dudw: "<<getNetwork()->dudw<<endl;
-
-                cout<<"F "<< getNetwork()->F << endl;
-
-           
+                cout<<"F "<< getNetwork()->F << endl;         
                 cout<<"Output"<<getNetwork()->y<<endl;
-
             }
 
-
-
-
-
-
-
-
             if(current_epoch>1)
-                getNetwork()->UpdateNeuronWeights_bray1996(1.0);
+                getNetwork()->UpdateNeuronWeights_bray1996(0.01);
+
             //    getNetwork()->CalcFDerivative();
 
             //          dispVec1.clear();
@@ -333,12 +317,11 @@ public:
 
 
         }
-      //      cout<<getNetwork()->F<<endl;
+            cout<<getNetwork()->F<<endl;
     /*                  cout<<"U: "<<getNetwork()->U << endl;
 
                 cout<<"V: "<< getNetwork()->V << endl;
     */
-        cout<<"F: "<< getNetwork()->F << endl;
 
                 
     }

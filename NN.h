@@ -16,8 +16,8 @@ public:
 	double weight;
 	double deltaweight;
 
-	double lambda_s = 0.021661;
-	double lambda_l = 0.000021661;
+	double lambda_s = 0.9785720620877001;
+	double lambda_l = 0.999783414964001;
 
 	void setDW(double dw)
 	{
@@ -64,8 +64,8 @@ public:
 	{
 		CalcdzsHidden(outputVal);
 
-		DUDW += (last_output_tilde - last_output) * (dztdw - dzdw);// + (1.0 - lambda_s) * oldOutputVal - outputVal);
-        DVDW += (last_output_bar - last_output) * (dzbdw - dzdw);// + (1.0 - lambda_l) * oldOutputVal - outputVal);
+		DUDW += (last_output_tilde - last_output) * (dztdw - dzdw1);// + (1.0 - lambda_s) * oldOutputVal - outputVal);
+        DVDW += (last_output_bar - last_output) * (dzbdw - dzdw1);// + (1.0 - lambda_l) * oldOutputVal - outputVal);
 //		cout<<DUDW<<endl;
 	}
 
@@ -89,8 +89,8 @@ public:
 
 */
 
-		DUDW += (last_output_tilde - last_output) * (dztdw - dzdw);// + (1.0 - lambda_s) * oldOutputVal - outputVal);
-        DVDW += (last_output_bar - last_output) * (dzbdw - dzdw);// + (1.0 - lambda_l) * oldOutputVal - outputVal);
+		DUDW += (last_output_tilde - last_output) * (dztdw - dzdw1);// + (1.0 - lambda_s) * oldOutputVal - outputVal);
+        DVDW += (last_output_bar - last_output) * (dzbdw - dzdw1);// + (1.0 - lambda_l) * oldOutputVal - outputVal);
 	//	cout<<DUDW<<endl;
 	}
 
@@ -139,8 +139,8 @@ public:
     double gamma_long = 0.0;
     double gamma_short = 0.0;
 
-	double lambda_s = 0.021661;
-	double lambda_l = 0.000021661;
+	double lambda_s = 0.9785720620877001;
+	double lambda_l = 0.999783414964001;
 
 
 

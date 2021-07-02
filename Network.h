@@ -45,8 +45,11 @@ public:
 	double y_bar = 0.0;
 	double y = 0.0;
 	double y_old = 0.0;
-	double lambda_s = 0.021661;
-	double lambda_l = 0.000021661;
+//	double lambda_s = 0.021661;
+//	double lambda_l = 0.000021661;
+
+	double lambda_s = 0.9785720620877001;
+	double lambda_l = 0.999783414964001;
 
 	vector<double> Output_Array;
 
@@ -97,12 +100,12 @@ public:
 
 	void Calcdztdw() //Equation A8
 	{
-		dztdw = lambda_s * dztdw + (1.0 - lambda_s) * y;
+		dztdw = lambda_s * dztdw + (1.0 - lambda_s) * y_old;
 	}
 
 	void Calcdzbdw() //Equation A8
 	{
-		dzbdw = lambda_l * dzbdw + (1.0 - lambda_l) * y;
+		dzbdw = lambda_l * dzbdw + (1.0 - lambda_l) * y_old;
 	}
 	vector<double> GetNeuronOutputsVector()
 	{
@@ -219,8 +222,8 @@ public:
 		y_bar_old = y_bar;
 
 		
-		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y_old;
-		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y_old;
+		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y;
+		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y;
 
 	
 	//	dzdw = y; //PRT maybe take it out
