@@ -271,8 +271,8 @@ public:
                 cout<<"Output"<<getNetwork()->y<<endl;
             }
 
-            if(current_epoch>50)
-                getNetwork()->UpdateNeuronWeights_bray1996(1.0);
+     //       if(current_epoch>50)
+     //           getNetwork()->UpdateNeuronWeights_bray1996(0.01);
 
             //    getNetwork()->CalcFDerivative();
 

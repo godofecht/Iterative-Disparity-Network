@@ -46,8 +46,8 @@ public:
 	{
 		dzdw1 = dzdw;
 		dzdw = zjt;
-		dztdw = lambda_s * (dztdw) + (1.0 - lambda_s) * dzdw1;
-		dzbdw = lambda_l * (dzbdw) + (1.0 - lambda_l) * dzdw1;		
+		dztdw = lambda_s * (dztdw) + (1.0 - lambda_s) * dzdw;
+		dzbdw = lambda_l * (dzbdw) + (1.0 - lambda_l) * dzdw;		
 //		cout<<dzdw<<endl;
 	}
 
@@ -55,8 +55,8 @@ public:
 	{
 		dzdw1 = dzdw;
 		dzdw = weight_jk * (1.0 - pow(zjt,2.0)) * outputVal;
-		dztdw = lambda_s * (dztdw) + (1.0 - lambda_s) * dzdw1;
-		dzbdw = lambda_l * (dzbdw) + (1.0 - lambda_l) * dzdw1;	
+		dztdw = lambda_s * (dztdw) + (1.0 - lambda_s) * dzdw;
+		dzbdw = lambda_l * (dzbdw) + (1.0 - lambda_l) * dzdw;	
 	//	cout<<dzdw<<endl;	
 	}
 
