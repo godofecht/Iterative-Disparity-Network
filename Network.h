@@ -222,8 +222,8 @@ public:
 		y_bar_old = y_bar;
 
 		
-		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y;
-		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y;
+		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y_old;
+		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y_old;
 
 	
 	//	dzdw = y; //PRT maybe take it out

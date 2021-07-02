@@ -68,7 +68,7 @@ public:
 
 
 
-        getNetwork()->PutWeights(weightVector990);
+        getNetwork()->PutWeights(weightVector0);
     }
 
     /*
@@ -238,9 +238,10 @@ public:
             getNetwork()->CalcF();
 
 
-
             getNetwork()->ComputeUVDerivatives();
             getNetwork()->ComputeAllNeuronalAverages();
+
+
 
             
             if (current_epoch == 0 && a == 100000)
@@ -270,8 +271,8 @@ public:
                 cout<<"Output"<<getNetwork()->y<<endl;
             }
 
-            if(current_epoch>1)
-                getNetwork()->UpdateNeuronWeights_bray1996(0.01);
+            if(current_epoch>50)
+                getNetwork()->UpdateNeuronWeights_bray1996(1.0);
 
             //    getNetwork()->CalcFDerivative();
 
