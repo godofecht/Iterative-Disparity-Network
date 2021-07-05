@@ -231,20 +231,20 @@ public:
             getNetwork()->y_old = getNetwork()->y;
             getNetwork()->y = GetResult()[0];
 
-            getNetwork()->calcIncrementedAverages();
 
+            getNetwork()->calcIncrementedAverages();
             getNetwork()->CalcU();
             getNetwork()->CalcV();
             getNetwork()->CalcF();
 
-
-            getNetwork()->ComputeUVDerivatives();
             getNetwork()->ComputeAllNeuronalAverages();
+            getNetwork()->ComputeUVDerivatives();
+
 
 
 
             
-            if (current_epoch == 0 && a == 100000)
+            if (false)
             {
                 
        //         cout<<getNetwork()->U<<endl;
@@ -271,8 +271,7 @@ public:
                 cout<<"Output"<<getNetwork()->y<<endl;
             }
 
-     //       if(current_epoch>50)
-     //           getNetwork()->UpdateNeuronWeights_bray1996(0.01);
+
 
             //    getNetwork()->CalcFDerivative();
 
@@ -285,7 +284,7 @@ public:
             //      targetVector[0] = disparityVector[a*7 + 2];
             //      getNetwork()->backPropagate(-getNetwork()->F);
 
-            error = 0.0;
+     //       error = 0.0;
 
             //    error = getNetwork()->F;
 
@@ -314,17 +313,19 @@ public:
         }
 
         */
-
-
-
         }
-            cout<<getNetwork()->F<<endl;
-    /*                  cout<<"U: "<<getNetwork()->U << endl;
+        if (current_epoch > 1)
+        {
+            getNetwork()->UpdateNeuronWeights_bray1996(1.0);
+
+            cout << getNetwork()->F << endl;
+            getNetwork()->clear_start_epoch_vars();
+        }
+
+        /*                  cout<<"U: "<<getNetwork()->U << endl;
 
                 cout<<"V: "<< getNetwork()->V << endl;
     */
-
-                
     }
 
     void write_csv(std::string filename, std::vector<std::pair<std::string, std::vector<double>>> dataset)

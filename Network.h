@@ -193,10 +193,18 @@ public:
 			for (int j = 0; j < m_layers[i].size(); j++)
 			{
 				for(int k=0;k<m_layers[i][j].m_outputWeights.size();k++)
-					m_layers[i][j].m_outputWeights[k].weight += learning_rate * m_layers[i][j].m_outputWeights[k].DFDW;
+				{
+					float epsilon = 0.01 * m_layers[i][j].m_outputWeights[k].weight  /  m_layers[i][j].m_outputWeights[k].DFDW;
+		//			m_layers[i][j].m_outputWeights[k].weight += learning_rate * m_layers[i][j].m_outputWeights[k].DFDW;
+					m_layers[i][j].m_outputWeights[k].weight += epsilon * m_layers[i][j].m_outputWeights[k].DFDW;
+				
+				}
 			}
 		}
 	}
+
+
+
 
 	void CalcF();
 
@@ -235,7 +243,27 @@ public:
 	{
 	}
 
+	void clear_start_epoch_vars()
+	{
+		U = 0;
+		V = 0;
+		F = 0;
 
+		for (int i = 0; i < m_layers.size(); i++)
+		{
+			//for each neuron
+			for (int j = 0; j < m_layers[i].size(); j++)
+			{
+				//for each weight
+				for (int k = 0; k < m_layers[i][j].m_outputWeights.size(); k++)
+				{
+					m_layers[i][j].m_outputWeights[k].DFDW = 0;
+					m_layers[i][j].m_outputWeights[k].DUDW = 0;
+					m_layers[i][j].m_outputWeights[k].DVDW = 0;
+				}
+			}
+		}
+	}
 
 	double getErrorDerivative(double dvdx, double dudx); //technically merit derivative because dFdX = -dEdX
 
