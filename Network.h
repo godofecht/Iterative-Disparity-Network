@@ -10,8 +10,9 @@ public:
 	Network(const vector<unsigned> &topology);
 	//	void backPropagate(const vector <double> &targetVals);
 	void backPropagate(double m_error);
+	void backPropagate(const vector<double> &targetVals,const vector<double> &currentVals);
 	void backPropagate(const vector <double> &targetVals);
-
+	void ConjugateGradientDescent(vector<double> weights,vector<double> search_dirs, vector<double> gradients,vector<double> step_lengths);
 
 	void feedForward(vector<double> &inputVals);
 	void getResults(vector<double> &resultVals);
@@ -20,7 +21,18 @@ public:
 	vector<double> GetWeights() const;
 	void PutWeights(vector<double> &weights);
 
-	void UpdateWeights();
+	void UpdateWeights()
+	{
+		for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; layerNum--)
+		{
+			Layer &layer = m_layers[layerNum];
+			Layer &prevLayer = m_layers[layerNum - 1];
+			for (unsigned n = 0; n < layer.size(); n++)
+			{
+				layer[n].updateInputWeights(prevLayer, GetWeights(), GetAllDFDW());
+			}
+		}
+	}
 
 	void NormalizeWeights(int connection_index);
 
@@ -28,6 +40,8 @@ public:
 	{
 		return m_layers;
 	}
+
+	
 
 	double V = 0.0;
 	double U = 0.0;
@@ -165,7 +179,6 @@ public:
 		for (int j = 0; j < m_layers[1].size(); j++)
 		{
 			m_layers[1][j].UpdateUVHidden(y, y_tilde, y_bar, y_tilde_old, y_bar_old);
-			m_layers[1][j].ComputeFDerivative(U, V);
 		}
 
 		for (int k = 0; k < m_layers[1].size(); k++)
@@ -180,9 +193,31 @@ public:
 		{
 
 			m_layers[0][j].UpdateUVInput(y, y_tilde, y_bar,y_tilde_old,y_bar_old,hiddenLayerWeights,hiddenLayerOldOutputs,hiddenLayerOutputs);
-			m_layers[0][j].ComputeFDerivative(U, V);
 			//		cout<<m_layers[i][j].m_outputWeights[0].F<<endl;
 		}
+	}
+
+	void ComputeFDerivatives()
+	{
+		for (int j = 0; j < m_layers[1].size(); j++)
+		{
+			m_layers[1][j].ComputeFDerivative(U, V);
+		}
+		//for each neuron
+		for (int j = 0; j < m_layers[0].size(); j++)
+		{
+			m_layers[0][j].ComputeFDerivative(U, V);
+		}
+	}
+
+	double getTotalError()
+	{
+		double total_error = 0.0;
+		for(int j=0;j<m_layers[1].size();j++)
+		{
+			total_error += m_layers[1][j].m_outputWeights[0].DFDW;
+		}
+		return total_error;
 	}
 
 	void UpdateNeuronWeights_bray1996(double learning_rate)
@@ -194,14 +229,32 @@ public:
 			{
 				for(int k=0;k<m_layers[i][j].m_outputWeights.size();k++)
 				{
-					float epsilon = 0.01 * m_layers[i][j].m_outputWeights[k].weight  /  m_layers[i][j].m_outputWeights[k].DFDW;
+
+					double sum_weight = 0;
+					for(int i=0;i< GetWeights().size();i++)
+					{
+						sum_weight += pow(GetWeights()[i],2.0);
+					}
+
+					double sum_dfdw = 0;
+					for(int i=0;i< GetAllDFDW().size();i++)
+					{
+						sum_dfdw += pow(GetAllDFDW()[i],2.0);
+					}
+
+					double epsilon = 0.01 * sqrt(sum_weight)  /  sqrt(sum_dfdw);
 		//			m_layers[i][j].m_outputWeights[k].weight += learning_rate * m_layers[i][j].m_outputWeights[k].DFDW;
 					m_layers[i][j].m_outputWeights[k].weight += epsilon * m_layers[i][j].m_outputWeights[k].DFDW;
-				
+
+
+		//			m_layers[i][j].m_outputWeights[k].weight += 0.01 * m_layers[i][j].m_outputWeights[k].weight / sum_weight * m_layers[i][j].m_outputWeights[k].DFDW / sum_dfdw;
+		//		
 				}
 			}
 		}
 	}
+
+
 
 
 
@@ -211,9 +264,9 @@ public:
 	void CalcFDerivative();
 	double FDeriv;
 
-	double getDUDX(int a);
+	double getDUDX();
 
-	double getDVDX(int a);
+	double getDVDX();
 
 	double dudw, dvdw;
 	double dy_bar, dy_tilde;
@@ -228,15 +281,24 @@ public:
 	{
 		y_tilde_old = y_tilde;
 		y_bar_old = y_bar;
-
-		
 		y_tilde = (lambda_s)*y_tilde + (1.0 - lambda_s) * y_old;
 		y_bar = (lambda_l)*y_bar + (1.0 - lambda_l) * y_old;
+	}
 
-	
-	//	dzdw = y; //PRT maybe take it out
-	//	calcDUDW();
-	//	calcDVDW();
+	void Remember()
+	{
+		for (int i = 0; i < m_layers.size(); i++)
+		{
+			//for each neuron
+			for (int j = 0; j < m_layers[i].size(); j++)
+			{
+				//for each weight
+				for (int k = 0; k < m_layers[i][j].m_outputWeights.size(); k++)
+				{
+					m_layers[i][j].m_outputWeights[k].Remember();
+				}
+			}
+		}
 	}
 
 	double calczjt()
@@ -245,9 +307,24 @@ public:
 
 	void clear_start_epoch_vars()
 	{
-		U = 0;
-		V = 0;
-		F = 0;
+		U = 0.0;
+		V = 0.0;
+		F = 0.0;
+
+//		dudx = 0.0;
+//		dvdx = 0.0;
+
+
+		dzdw = 0.0;
+		dzbdw = 0.0;
+		dztdw = 0.0;
+		dudx = 0.0;
+		dvdx = 0.0;
+		
+
+
+
+
 
 		for (int i = 0; i < m_layers.size(); i++)
 		{
@@ -257,15 +334,25 @@ public:
 				//for each weight
 				for (int k = 0; k < m_layers[i][j].m_outputWeights.size(); k++)
 				{
-					m_layers[i][j].m_outputWeights[k].DFDW = 0;
-					m_layers[i][j].m_outputWeights[k].DUDW = 0;
-					m_layers[i][j].m_outputWeights[k].DVDW = 0;
+					m_layers[i][j].m_outputWeights[k].DFDW = 0.0;
+					m_layers[i][j].m_outputWeights[k].DUDW = 0.0;
+					m_layers[i][j].m_outputWeights[k].DVDW = 0.0;
+//					m_layers[i][j].m_outputWeights[k].y_bar = 0.0;
+//					m_layers[i][j].m_outputWeights[k].y_tilde = 0.0;
+//					m_layers[i][j].m_outputWeights[k].dzbdw1 = 0.0;
+//					m_layers[i][j].m_outputWeights[k].dztdw1 = 0.0;
+//					m_layers[i][j].m_outputWeights[k].dzbdw = 0.0;
+//					m_layers[i][j].m_outputWeights[k].dztdw = 0.0;
+//					m_layers[i][j].m_outputWeights[k].dzdw = 0.0;
+//					m_layers[i][j].m_outputWeights[k].dzdw1 = 0.0;
+//					m_layers[i][j].m_outputWeights[k].y_bar_old = 0.0;
+//					m_layers[i][j].m_outputWeights[k].y_tilde_old = 0.0;
 				}
 			}
 		}
 	}
 
-	double getErrorDerivative(double dvdx, double dudx); //technically merit derivative because dFdX = -dEdX
+	double getErrorDerivative(); //technically merit derivative because dFdX = -dEdX
 
 	vector<double> getConvolutionalMaskDashU(double h)
 	{
@@ -372,19 +459,34 @@ public:
 		}
 	}
 
+	vector<double> GetAllDFDW()
+	{
+		//this will hold the weights
+		vector<double> dfdws;
+		//for each layer
+		for (int i = 0; i < m_layers.size(); i++)
+		{
+			//for each neuron
+			for (int j = 0; j < m_layers[i].size(); j++)
+			{
+				//for each weight
+				for (int k = 0; k < m_layers[i][j].m_outputWeights.size(); k++)
+				{
+					dfdws.push_back(m_layers[i][j].m_outputWeights[k].DFDW);
+				}
+			}
+		}
+		return dfdws;
+	}
+
 	vector<double> GetAllActivations()
 	{
 		Layer &outputLayer = m_layers.back();
 		Layer &hiddenLayer = m_layers[1];
 		Layer &inputLayer = m_layers[0];
-
 		vector<double> ActivationVector;
-
 		//iterate through hidden layers, taking 1st output of 1st layer
-
 		int weightcounter = 0;
-
-
 		for (int i = 0; i < inputLayer.size(); i++)
 		{
 			ActivationVector.push_back(inputLayer[i].getOutputVal());
@@ -393,14 +495,11 @@ public:
 		{
 			ActivationVector.push_back(hiddenLayer[j].getOutputVal());
 		}
-		for(int k=0;k<outputLayer.size();k++)
+		for(int k = 0; k < outputLayer.size(); k++)
 		{
 			ActivationVector.push_back(outputLayer[k].getOutputVal());
 		}
-
-
 		return(ActivationVector);
-
 		//iterate through weights from hidden layer to single output
 	}
 

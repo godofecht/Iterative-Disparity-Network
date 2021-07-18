@@ -45,7 +45,32 @@ void Neuron::feedForwardHidden(Layer &prevLayer) //Hidden Layer Activations
 
 	m_outputVal =  Neuron::transferFunction(sum);
 }
+void Neuron::updateInputWeights(Layer &prevLayer,vector<double> weights,vector<double> dfdws) //Formulas adapted into code.
+{
+	for (unsigned n = 0; n < prevLayer.size(); n++)
+	{
+		Neuron &neuron = prevLayer[n];
+		double oldDeltaWeight = neuron.m_outputWeights[m_myIndex].deltaweight;
+		
+		double newDeltaWeight =
+			// Individual input is magnified by the gradient and train rate:
+			0.01
+			* m_gradient
+			* neuron.getOutputVal()
+			+ 0.10
+			* oldDeltaWeight;
 
+	//	cout<<newDeltaWeight<<endl;
+
+	//	cout<<neuron.m_gradient<<" "<<neuron.m_outputWeights[m_myIndex].DFDW<<" "<<m_gradient <<endl;
+
+		//	cout<<neuron.m_outputWeights[m_myIndex].DFDW<<" "<<m_gradient<<endl;
+
+
+		neuron.m_outputWeights[m_myIndex].deltaweight = newDeltaWeight;
+		neuron.m_outputWeights[m_myIndex].weight += newDeltaWeight;
+	}
+}
 
 void Neuron::updateInputWeights(Layer &prevLayer) //Formulas adapted into code.
 {
@@ -56,10 +81,13 @@ void Neuron::updateInputWeights(Layer &prevLayer) //Formulas adapted into code.
 
 		double newDeltaWeight =
 			// Individual input is magnified by the gradient and train rate:
-			0.00001 //No learning rate because F adjusts it automatically
-			* m_outputVal
-			* m_gradient;
+			0.01//No learning rate because F adjusts it automatically
+			* m_gradient
+			* neuron.getOutputVal();
+			+ 0.10
+			* oldDeltaWeight;
 						// Also adding momentum = a fraction of the previous delta weight;
+
 
 //		cout<<newDeltaWeight<<endl;
 
@@ -86,7 +114,7 @@ void Neuron::setOutputVal(double n)
 }
 double Neuron::randomWeight()
 {
-		return (double(rand()) / double(RAND_MAX));
+	return (double(rand()) / double(RAND_MAX));
 }
 
 double Neuron::sumDOW(const Layer &nextLayer) const
@@ -101,7 +129,8 @@ double Neuron::sumDOW(const Layer &nextLayer) const
 }
 double Neuron::transferFunctionDerivative(double x)
 {
-	return 1.0 - x*x;
+//	return (1.0 - x*x);
+	return(1.0 - tanh(x) * tanh(x));
 }
 double Neuron::transferFunction(double x)
 {
@@ -112,41 +141,40 @@ int Neuron::getIndex()
 {
 	return m_myIndex;
 }
+void Neuron::calcInputGradients(const Layer &nextLayer)
+{
+	double dow = sumDOW(nextLayer);
+	double derivative = 1.0;
+	m_gradient = dow*derivative;
+	clip(m_gradient);
+}
 void Neuron::calcHiddenGradients(const Layer &nextLayer)
 {
 	double dow = sumDOW(nextLayer);
 	double derivative = Neuron::transferFunctionDerivative(m_outputVal);
 	m_gradient = dow*derivative;
-}
-void Neuron::calcInputGradients(const Layer &nextLayer)
-{
-	double dow = sumDOW(nextLayer);
-	double derivative = 1.0;
-
-//	double derivative = Neuron::transferFunctionDerivative(m_outputVal);
-	m_gradient = dow*derivative;
+	clip(m_gradient);
 }
 
 
-/*
+
 void Neuron::calcOutputGradients(double error) //Looks at the difference between the target values and the output values.
 {
-	double delta = error;
-	double derivative = Neuron::transferFunctionDerivative(m_outputVal);
-//	m_gradient = dow*derivative;
-	m_gradient = delta * 1.0;
+	m_gradient = error;
+	clip(m_gradient);
 
 }
-*/
 
+/*
 void Neuron::calcOutputGradients(double targetVal)
 {
 	double delta = targetVal - m_outputVal;
-	m_gradient = delta * 1.0;
+	m_gradient = delta * m_outputVal;
 
-
+	clip(m_gradient);
 //	cout<<m_gradient<<endl;
 }
+*/
 
 
 

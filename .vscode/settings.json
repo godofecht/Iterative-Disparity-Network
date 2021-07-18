@@ -59,6 +59,8 @@
         "numeric": "cpp",
         "unordered_map": "cpp",
         "xhash": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "random": "cpp",
+        "xmemory0": "cpp"
     }
 }
