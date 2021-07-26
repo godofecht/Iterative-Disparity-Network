@@ -108,7 +108,7 @@ public:
 		if (isnan(1.0 / U))
 			u1 = 0.0;
 
-		DFDW = (v1 * DVDW - u1 * DUDW);
+		DFDW = (v1 * DVDW) - (u1 * DUDW);
 
 		if (isnan(DFDW))
 			DFDW = 0.0;

@@ -158,9 +158,6 @@ void Network::backPropagate(double m_error)
 	Layer &hiddenLayer = m_layers[1];
 	Layer &inputLayer = m_layers[0];
 
-	m_error = m_error; // RMS
-
-
 	// Calculate output layer gradients
 	for (int n = 0; n < outputLayer.size(); n++)
 	{
