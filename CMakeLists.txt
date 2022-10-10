@@ -1,11 +1,15 @@
 cmake_minimum_required(VERSION 3.13)  # CMake version check
 project(DisparityNetwork)             # Create project "Disparity Network"
-set(CMAKE_CXX_STANDARD 17)            # Enable c++14 standard
+set(CMAKE_CXX_STANDARD 17)            # Enable c++17 standard
 
 
 #Clean this up and separate into HEADERS, COMPILATION_UNITS, ETC
-set (SOURCES NN.h Network.h dispnet.h disparityNet.h
-filesystem.h model.h utils.h image1.csv image2.csv)
+set (SOURCES 
+NN.h Network.h dispnet.h disparityNet.h filesystem.h model.h utils.h image1.csv image2.csv
+)
+
+
+
 add_executable(DisparityNetwork ${SOURCES})
 
 target_sources(DisparityNetwork PUBLIC ${SOURCES} main.cpp NN.cpp Network.cpp)
