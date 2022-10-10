@@ -21,18 +21,7 @@ public:
 	vector<double> GetWeights() const;
 	void PutWeights(vector<double> &weights);
 
-	void UpdateWeights()
-	{
-		for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; layerNum--)
-		{
-			Layer &layer = m_layers[layerNum];
-			Layer &prevLayer = m_layers[layerNum - 1];
-			for (unsigned n = 0; n < layer.size(); n++)
-			{
-				layer[n].updateInputWeights(prevLayer, GetWeights(), GetAllDFDW());
-			}
-		}
-	}
+    void UpdateWeights();
 
 	void NormalizeWeights(int connection_index);
 
@@ -388,7 +377,7 @@ public:
 			}
 			kernelU.push_back(kernelVal);
 		}
-		normalizeVector(kernelU);
+		normalizeVector (kernelU);
 		return kernelU;
 	}
 
@@ -411,7 +400,7 @@ public:
 			}
 			kernelV.push_back(kernelVal);
 		}
-		normalizeVector(kernelV);
+		normalizeVector (kernelV);
 		return kernelV;
 	}
 
@@ -489,15 +478,15 @@ public:
 		int weightcounter = 0;
 		for (int i = 0; i < inputLayer.size(); i++)
 		{
-			ActivationVector.push_back(inputLayer[i].getOutputVal());
+			ActivationVector.push_back (inputLayer[i].getOutputVal());
 		}
 		for (int j = 0; j < hiddenLayer.size(); j++)
 		{
-			ActivationVector.push_back(hiddenLayer[j].getOutputVal());
+			ActivationVector.push_back (hiddenLayer[j].getOutputVal());
 		}
 		for(int k = 0; k < outputLayer.size(); k++)
 		{
-			ActivationVector.push_back(outputLayer[k].getOutputVal());
+			ActivationVector.push_back (outputLayer[k].getOutputVal());
 		}
 		return(ActivationVector);
 		//iterate through weights from hidden layer to single output
@@ -505,7 +494,7 @@ public:
 
 	void CalcAverages();
 
-	int getSub(int a, int k)
+	int getSub (int a, int k)
 	{
 		int diff = a - k;
 		if (diff < 0.0)

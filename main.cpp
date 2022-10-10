@@ -1,10 +1,5 @@
-
 #include "disparityNet.h"
 #include "filesystem.h"
-
-
-
-
 
 using namespace std;
 
@@ -12,18 +7,23 @@ int NUM_EPOCHS = 2000;
 
 int LOG_RATE = 50;
 
+void formatTime (string timeString)
+{
+    timeString.erase (remove (timeString.begin(), timeString.end(), ' '), timeString.end());
+    timeString.erase (remove (timeString.begin(), timeString.end(), '\n'), timeString.end());
+    timeString.erase (remove (timeString.begin(), timeString.end(), ':'), timeString.end());
+}
+
 int main()
 {
     vector<unsigned> topology;
-    topology.push_back(11); //10 input neurons and 1 bias neuron
-    topology.push_back(10);
-    topology.push_back(1);
+    topology.push_back (11); //10 input neurons and 1 bias neuron
+    topology.push_back (10);
+    topology.push_back (1);
     DisparityNet dNet(topology); //Extracts signel disparity
 
-    string time(GetTimeAsString());
-    time.erase(remove(time.begin(), time.end(), ' '), time.end());
-    time.erase(remove(time.begin(), time.end(), '\n'), time.end());
-    time.erase(remove(time.begin(), time.end(), ':'), time.end());
+    string time (GetTimeAsString());
+    formatTime (time);
 
     bool bShouldSaveGeneratedData = true;
     for (int i = 0; i < NUM_EPOCHS; i++)
@@ -32,7 +32,6 @@ int main()
     //    dNet.Train_MakeBackProp(i, bShouldSaveGeneratedData);
         if (i%LOG_RATE == 0)
         {
-
             if (bShouldSaveGeneratedData)
             {
                 ghc::filesystem::create_directories("Logs/"+time+"/"+to_string(i));

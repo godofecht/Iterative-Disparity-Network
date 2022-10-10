@@ -1,6 +1,6 @@
 #include "Network.h"
-#include "NN.cpp"
-#include <vector>
+//#include "NN.cpp"
+//#include <vector>
 
 Network::Network(const vector<unsigned> &topology)
 {
@@ -31,6 +31,19 @@ Network::Network(const vector<unsigned> &topology)
 	dzbdw = 0.0;
 	dudw = 0.0;
 	dvdw = 0.0;
+}
+
+void Network::UpdateWeights()
+{
+    for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; layerNum--)
+    {
+        Layer &layer = m_layers[layerNum];
+        Layer &prevLayer = m_layers[layerNum - 1];
+        for (unsigned n = 0; n < layer.size(); n++)
+        {
+            layer[n].updateInputWeights(prevLayer, GetWeights(), GetAllDFDW());
+        }
+    }
 }
 
 double dztdw,dzbdw;

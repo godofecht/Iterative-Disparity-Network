@@ -1,7 +1,17 @@
 #pragma once
 
 #include <iostream>
-#include <io.h>
+
+
+#ifdef __APPLE__
+        #include <sys/uio.h>
+#else
+	#include <io.h>
+#endif
+
+
+
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <ctime>
@@ -23,7 +33,7 @@ char* GetTimeAsString()
 
 void createFolder(const char* name)
 {
-    mkdir(name);
+    mkdir (name, 0777);
 }
 
 void print(const char *name, double value)

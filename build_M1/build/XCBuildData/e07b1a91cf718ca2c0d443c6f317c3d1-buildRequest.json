@@ -1,0 +1,59 @@
+{
+  "_buildCommand2" : {
+    "command" : "prepareForIndexing",
+    "enableIndexBuildArena" : false,
+    "targets" : null
+  },
+  "buildCommand" : "build",
+  "configuredTargets" : [
+    {
+      "guid" : "c7917514b616172f248958b0156b5e7006d8556664feb380e264e31c66819731"
+    }
+  ],
+  "containerPath" : "/Users/abhishekshivakumar/academics/Iterative-Disparity-Network/build_M1/DisparityNetwork.xcodeproj",
+  "continueBuildingAfterErrors" : true,
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "arm64",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : false,
+      "platform" : "macosx",
+      "sdk" : "macosx12.3",
+      "sdkVariant" : "macos",
+      "supportedArchitectures" : [
+        "arm64e",
+        "arm64",
+        "x86_64"
+      ],
+      "targetArchitecture" : "arm64"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "",
+      "buildProductsPath" : "",
+      "derivedDataPath" : "/Users/abhishekshivakumar/Library/Developer/Xcode/DerivedData",
+      "indexDataStoreFolderPath" : "/Users/abhishekshivakumar/Library/Developer/Xcode/DerivedData/DisparityNetwork-gbkiqtyxfbhhfdeuxizsqwmmamag/Index/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/abhishekshivakumar/Library/Developer/Xcode/DerivedData/DisparityNetwork-gbkiqtyxfbhhfdeuxizsqwmmamag/Index/PrecompiledHeaders",
+      "pchPath" : ""
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "synthesized" : {
+        "table" : {
+          "ENABLE_PREVIEWS" : "NO"
+        }
+      }
+    }
+  },
+  "qos" : "default",
+  "schemeCommand" : "launch",
+  "schemeCommand2" : "launch",
+  "shouldCollectMetrics" : false,
+  "showNonLoggedProgress" : true,
+  "useDryRun" : true,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

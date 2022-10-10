@@ -1,10 +1,5 @@
-#include<vector>
-#include<cmath>
-#include<cassert>
-#include<iostream>
 #include "NN.h"
-#include<time.h>
-#include<stdlib.h>
+
 using namespace std;
 
  Neuron::Neuron(unsigned numOutputs, unsigned myIndex)

@@ -3,7 +3,6 @@
 
 #include "NN.h"
 #include "Network.h"
-#include "Network.cpp"
 #include <iostream>
 
 class Model
@@ -33,37 +32,40 @@ public:
     {
         topology = tp;
     }
+    
 	void InitializeTopology()
 	{
 		thisNetwork = new Network(topology);
 	}
-/*	void BackPropagate(vector<double> targetVals)
+    
+	void BackPropagate(vector<double> targetVals)
 	{
 		thisNetwork->backPropagate(targetVals);
 	}
-	*/
-
-
-
+	
 	Network* getNetwork()
 	{
 		return thisNetwork;
 	}
+    
 	vector<double> GetWeights()
 	{
 		weights = thisNetwork->GetWeights();
 		return weights;
 	}
+    
 	void feedforward(vector<double> inputs)
 	{
 		thisNetwork->feedForward(inputs);
 	}
+    
 	vector<double> GetResult()
 	{
 		vector<double> resultVals;
 		thisNetwork->getResults(resultVals);
 		return resultVals;
 	}
+    
 	void SetWeights(vector<double> weights)
 	{
 		thisNetwork->PutWeights(weights);
@@ -73,7 +75,9 @@ public:
     {
         for(int i=0;i<topology.size();i++)
         {
-       //     std::cout<<topology[i]<<"\n";
+            std::cout<<"Topology: ";
+            std::cout<<topology[i]<<" ";
+            std::cout<<std::endl;
         }
     }
 	
