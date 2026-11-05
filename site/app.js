@@ -247,7 +247,9 @@
       hour12: false, timeZone: "UTC"
     }) + " UTC");
     setText("experiment-seed", data.meta.seed);
-    setText("dataset-hash", data.meta.dataset_sha256["image1.csv"]);
+    setText("left-hash", data.meta.dataset_sha256["image1.csv"]);
+    setText("right-hash", data.meta.dataset_sha256["image2.csv"]);
+    setText("reference-hash", data.meta.dataset_sha256["disparity.csv"]);
     const run = new URL(data.meta.run_url);
     if (run.host === "github.com" && run.pathname.startsWith("/godofecht/Iterative-Disparity-Network/actions/runs/")) {
       element("run-link").href = run.href;

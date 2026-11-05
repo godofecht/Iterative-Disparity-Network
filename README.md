@@ -2,6 +2,12 @@
 
 A reproducible C++17 experiment in **unsupervised stereo-disparity learning** via spatial invariance. This is a repaired, runnable implementation of the repository's original one-dimensional 1,000-position experiment, rather than a claim of reproducing the full two-dimensional benchmark.
 
+## Interactive research observatory
+
+**[Explore the verified CI research dashboard](https://godofecht.github.io/Iterative-Disparity-Network/)** — an interactive GitHub Pages site that is rebuilt from each successful `main` GitHub Actions run. It displays the actual stereo input sequences, evaluation-only ground truth, final learned response, 21 real model checkpoints over 1,000 conjugate-gradient iterations, a live checkpoint slider, hidden-layer activations, training merit, and downloadable CSVs and JSON.
+
+Each published page is linked to its exact GitHub Actions run, commit and dataset SHA-256 fingerprints. The website is strictly a 1D experiment; 2D scientific replication is tracked in [issue #3](https://github.com/godofecht/Iterative-Disparity-Network/issues/3). The source is in `site/`; `scripts/build_site_data.py` validates and packages the experiment outputs. `.github/workflows/ci.yml` publishes the Pages artifact only after Linux, macOS and Windows checks pass.
+
 ## Research basis
 
 Eglen, Bray & Stone (1997), *Unsupervised discovery of invariances*, Network: Computation in Neural Systems 8:441–452, [author-hosted paper](https://www.damtp.cam.ac.uk/user/sje30/papers/network97.pdf). Related earlier work: Eglen, Stone & Barrow (1996), *Learning perceptual invariances: A spatial model*.
