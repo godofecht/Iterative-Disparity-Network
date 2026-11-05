@@ -187,6 +187,36 @@
     plotLearning(); paintStereo();
   }
 
+  function plotOrientationLearning() {
+    const canvas=$("orientation-learning-plot");
+    const ctx=canvas.getContext("2d");
+    const width=1160,height=230,p={left:49,right:23,top:16,bottom:32};
+    canvas.width=width;canvas.height=height;
+    const values=report.orientation.history;
+    const maxEpoch=Math.max(1,values.at(-1).epoch);
+    const low=Math.min(0,...values.map(v=>v.merit));
+    const high=Math.max(...values.map(v=>v.merit));
+    const extent=Math.max(.000001,high-low);
+    const x=epoch=>p.left+(width-p.left-p.right)*epoch/maxEpoch;
+    const y=merit=>p.top+(height-p.top-p.bottom)*(high-merit)/extent;
+    for(let i=0;i<=4;i++){
+      const py=p.top+(height-p.top-p.bottom)*i/4;
+      ctx.strokeStyle=COLORS.grid;ctx.setLineDash([3,6]);
+      ctx.beginPath();ctx.moveTo(p.left,py);ctx.lineTo(width-p.right,py);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=COLORS.text;ctx.font="11px system-ui";
+      ctx.textAlign="right";ctx.fillText(fmt(high-extent*i/4,3),p.left-10,py+4);
+    }
+    ctx.lineWidth=2.6;ctx.strokeStyle=COLORS.cyan;ctx.beginPath();
+    values.forEach((pt,i)=>i===0?ctx.moveTo(x(pt.epoch),y(pt.merit)):
+                                  ctx.lineTo(x(pt.epoch),y(pt.merit)));
+    ctx.stroke();ctx.fillStyle=COLORS.text;ctx.textAlign="center";
+    [0,.25,.5,.75,1].forEach(f=>
+      ctx.fillText(String(Math.round(maxEpoch*f)),x(maxEpoch*f),height-10));
+    canvas.setAttribute("aria-label","True orientation learning objective increased from "+
+      fmt(values[0].merit,4)+" to "+fmt(values.at(-1).merit,4)+
+      " over "+maxEpoch+" optimization steps");
+  }
   function stop() {
     if(timer!==null){clearInterval(timer);timer=null;}
     text("play-2d","▶ Play learning");
@@ -261,6 +291,7 @@
       text("orientation-test",fmt(om.test_orientation_r2,4));
       text("orientation-r2-train",fmt(om.training_orientation_r2,4));
       text("orientation-r2-test",fmt(om.test_orientation_r2,4));
+      text("orientation-merit",fmt(om.final_merit,4));
       seedTable("stereo-seeds",data.replications.stereo,"train_abs_r","test_abs_r",
                 data.replications.summary.stereo_train_abs_r,
                 data.replications.summary.stereo_test_abs_r);
@@ -276,7 +307,7 @@
       text("2d-commit",data.provenance.commit.substring(0,12));
       readyStatus("● VERIFIED MEASUREMENT / GitHub Actions run "+
                   run.pathname.split("/").pop()+" / 3 predefined seeds / "+data.provenance.commit.substring(0,8));
-      bind();paintProgress();paintOrientation();
+      bind();paintProgress();paintOrientation();plotOrientationLearning();
     }catch(error){
       readyStatus("Two-dimensional CI measurements are unavailable: "+error.message+
                   ". Inspect the latest GitHub Actions run.",true);
