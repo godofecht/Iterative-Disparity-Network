@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive, reproducible demonstration of unsupervised stereo disparity learning, built from verified GitHub Actions training outputs.">
+  <meta name="theme-color" content="#0b1018">
+  <title>Seeing depth without labels — Iterative Disparity Network</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="Iterative Disparity Network — home">
+        <span class="brand-glyph" aria-hidden="true"><span></span><span></span></span>
+        <span><strong>IDN</strong><small>Research observatory</small></span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#experiment">The experiment</a>
+        <a href="#learning">Learning</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#reproduce">Reproduce</a>
+      </nav>
+      <a class="header-github" href="https://github.com/godofecht/Iterative-Disparity-Network" target="_blank" rel="noopener noreferrer">View source <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> EXPERIMENT 001 <span class="eyebrow-divider">/</span> UNSUPERVISED VISION</p>
+        <h1 id="hero-title">Learning to see <em>depth</em><br>without being told.</h1>
+        <p class="hero-description">Two slightly different signals enter a tiny neural network. Without any disparity labels during training, a shared representation learns to track the hidden shift between them.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#experiment">Explore the evidence <span aria-hidden="true">↘</span></a>
+          <a class="button secondary" href="#reproduce">Inspect the methodology <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="source-status" id="data-status" role="status" aria-live="polite">Loading measured output from the CI experiment…</div>
+      </div>
+      <div class="hero-panel" aria-label="Measured learning summary">
+        <div class="hero-panel-top"><span>OBSERVED CORRELATION</span><span class="live-label">CI VERIFIED</span></div>
+        <div class="hero-stat" id="hero-corr">—</div>
+        <p class="hero-stat-label">absolute Pearson correlation between learned output and reference disparity</p>
+        <div class="rule"></div>
+        <svg id="hero-topology" viewBox="0 0 500 240" role="img" aria-label="Eleven input units, ten hidden units and one output, connected by shared network weights"></svg>
+        <div class="hero-panel-bottom"><span>STEREO INPUT</span><span>SHARED-WEIGHT NETWORK</span><span>LEARNED RESPONSE</span></div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <section class="metrics" aria-label="Measured results from the latest published CI run">
+        <article class="metric"><div class="metric-label">DISPARITY SAMPLES <span>01</span></div><div class="metric-value" id="metric-samples">—</div><p>independent spatial positions</p></article>
+        <article class="metric"><div class="metric-label">OBJECTIVE, INITIAL <span>02</span></div><div class="metric-value" id="metric-initial">—</div><p>before learning begins</p></article>
+        <article class="metric"><div class="metric-label">OBJECTIVE, FINAL <span>03</span></div><div class="metric-value highlight" id="metric-final">—</div><p>after conjugate-gradient ascent</p></article>
+        <article class="metric"><div class="metric-label">OPTIMIZATION STEPS <span>04</span></div><div class="metric-value" id="metric-epochs">—</div><p>accepted weight updates</p></article>
+      </section>
+    </div>
+
+    <section id="experiment" class="section wrap" aria-labelledby="experiment-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow muted">01 / THE OBSERVATION</p><h2 id="experiment-heading">Two eyes. One hidden variable.</h2></div>
+        <p>The data are actual one-dimensional stereo intensity sequences from the repository, not generated illustrations. Drag the spatial focus to inspect the paired measurements and their inferred disparity.</p>
+      </div>
+      <div class="control-bar">
+        <label for="focus-slider">Spatial focus <strong id="focus-label">—</strong></label>
+        <input type="range" id="focus-slider" min="0" max="999" step="1" value="500" disabled>
+        <span class="range-context">Scroll through the 1,000 sampled positions</span>
+      </div>
+      <div class="two-panels">
+        <article class="chart-card">
+          <div class="chart-heading"><span>FIG. 01</span><h3>Incoming stereo signals</h3><p>Raw intensity, left vs. right eye</p></div>
+          <div class="legend"><span><i class="swatch cyan"></i>Left signal</span><span><i class="swatch violet"></i>Right signal</span></div>
+          <div id="signal-plot" class="plot" role="img" aria-label="Chart of the left and right input signals near the selected position"></div>
+          <p class="figure-note">Five values from each eye form the measured inputs at each position. The eleventh input is a fixed bias of 1.</p>
+        </article>
+        <article class="chart-card">
+          <div class="chart-heading"><span>FIG. 02</span><h3>The recovered depth signal</h3><p>Actual model output vs. evaluation-only reference</p></div>
+          <div class="legend"><span><i class="swatch cyan"></i>Learned response</span><span><i class="swatch amber"></i>Ground-truth disparity</span></div>
+          <div id="disparity-plot" class="plot" role="img" aria-label="Chart comparing learned disparity with ground-truth disparity near the selected position"></div>
+          <p class="figure-note">Reference disparity is used for analysis only. The learner never sees target disparity during optimization.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="learning" class="section learning-section" aria-labelledby="learning-heading">
+      <div class="wrap">
+        <div class="section-heading">
+          <div><p class="eyebrow muted">02 / WATCH IT LEARN</p><h2 id="learning-heading">From random weights to structure.</h2></div>
+          <p>The timeline replays <strong>actual recorded checkpoints</strong> from training, not a visually interpolated guess. See the prediction and its correlation evolve as the objective improves.</p>
+        </div>
+        <div class="learning-layout">
+          <div class="learning-main">
+            <div class="chart-card wide">
+              <div class="chart-heading"><span>FIG. 03</span><h3>Optimization trajectory</h3><p>Spatial-invariance merit F = log((V + ε) / (U + ε))</p></div>
+              <div class="legend"><span><i class="swatch cyan"></i>Objective F</span><span><i class="swatch amber"></i>Selected epoch</span></div>
+              <div id="training-plot" class="plot large" role="img" aria-label="Graph of the training objective and selected epoch"></div>
+            </div>
+            <div class="timeline-controls">
+              <div class="timeline-head"><label for="epoch-slider">TRAINING CHECKPOINT <strong id="epoch-label">—</strong></label><button id="play-button" type="button" disabled>▶ Play evolution</button></div>
+              <input id="epoch-slider" type="range" min="0" max="0" value="0" step="1" disabled>
+              <div class="timeline-endpoints"><span>INITIAL WEIGHTS</span><span>FINAL MODEL</span></div>
+            </div>
+          </div>
+          <aside class="learning-side" aria-label="Selected training checkpoint statistics">
+            <p class="eyebrow muted">CURRENT CHECKPOINT</p>
+            <div class="side-reading"><span>Epoch</span><strong id="selected-epoch">—</strong></div>
+            <div class="side-reading"><span>Merit F</span><strong id="selected-merit">—</strong></div>
+            <div class="side-reading"><span>Pearson r</span><strong id="selected-corr">—</strong></div>
+            <div class="side-reading"><span>|r| against reference</span><strong id="selected-abs">—</strong></div>
+            <div class="side-note"><span class="small-orb" aria-hidden="true"></span><p>Strong spatial invariance can emerge without teaching the model what disparity values should be. Correlation is a <em>post-training measurement</em>, not its learning target.</p></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture" class="section wrap" aria-labelledby="architecture-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow muted">03 / WHAT IS HAPPENING INSIDE</p><h2 id="architecture-heading">A very small network. A global constraint.</h2></div>
+        <p>Every sampled position has the same 11–10–1 network. Learning updates a single shared set of 120 weights by comparing the output field at short and long spatial scales.</p>
+      </div>
+      <div class="architecture-grid">
+        <article class="method-card"><div class="method-index">01</div><h3>Local sensing</h3><p>Five left-eye intensities and five right-eye intensities describe the local stereo neighbourhood. A constant bias completes 11 inputs.</p><div class="method-formula">x ∈ ℝ¹¹</div></article>
+        <article class="method-card"><div class="method-index">02</div><h3>Shared encoding</h3><p>Ten tanh units transform the local patch into features. A linear readout projects these into one scalar response.</p><div class="method-formula">y = w₂ · tanh(W₁x)</div></article>
+        <article class="method-card"><div class="method-index">03</div><h3>Spatial learning</h3><p>Convolutional averages of the outputs are compared at two scales. Gradients through the averages update the shared weights.</p><div class="method-formula">max F = log((V+ε)/(U+ε))</div></article>
+      </div>
+      <div class="two-panels architecture-plots">
+        <article class="chart-card">
+          <div class="chart-heading"><span>FIG. 04</span><h3>Hidden-unit responses</h3><p>Final model · ten learned nonlinear features across the selected region</p></div>
+          <canvas id="hidden-map" class="heatmap" height="190" aria-label="Ten-row heatmap of learned hidden-layer activations" role="img"></canvas>
+          <div class="heatmap-legend"><span>−1</span><span>HIDDEN ACTIVATION / tanh</span><span>+1</span></div>
+          <p class="figure-note">Each row is one hidden unit; colour represents signed activation. The grid tracks the spatial focus.</p>
+        </article>
+        <article class="chart-card">
+          <div class="chart-heading"><span>FIG. 05</span><h3>Reference vs. learned response</h3><p>All sampled positions · final model</p></div>
+          <div id="scatter-plot" class="plot" role="img" aria-label="Scatter plot comparing the evaluated reference disparity and model output"></div>
+          <p class="figure-note">A correlation near ±1 means the recovered shape tracks disparity. Absolute sign and physical scale are not constrained by the unsupervised objective.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="reproduce" class="section methodology-section" aria-labelledby="reproduce-heading">
+      <div class="wrap">
+        <div class="section-heading">
+          <div><p class="eyebrow muted">04 / REPRODUCIBILITY</p><h2 id="reproduce-heading">Every number has a provenance.</h2></div>
+          <p>This report is compiled from files emitted by the C++ experiment inside GitHub Actions. When a new successful commit is built on main, the published evidence updates with that run.</p>
+        </div>
+        <div class="provenance-grid">
+          <div class="provenance-card">
+            <div class="meta-line"><span>CI WORKFLOW</span><a id="run-link" href="https://github.com/godofecht/Iterative-Disparity-Network/actions" target="_blank" rel="noopener noreferrer">Open verified run ↗</a></div>
+            <div class="meta-line"><span>COMMIT</span><code id="commit-id">—</code></div>
+            <div class="meta-line"><span>GENERATED</span><span id="generated-at">—</span></div>
+            <div class="meta-line"><span>REPRODUCIBLE SEED</span><code id="experiment-seed">—</code></div>
+            <div class="meta-line"><span>STEREO INPUT SHA-256</span><code id="dataset-hash" class="hash">—</code></div>
+            <div class="download-row"><a href="./data/experiment.json" download>Full report JSON ↓</a><a href="./data/checkpoints.csv" download>All checkpoints ↓</a><a href="./data/training_metrics.csv" download>Optimization metrics ↓</a><a href="./data/weights.csv" download>Model weights ↓</a></div>
+          </div>
+          <div class="scope-card">
+            <div class="scope-label">RESEARCH SCOPE <span>IMPORTANT</span></div>
+            <h3>A faithful 1D experiment, <em>not</em> a claim of full 2D replication.</h3>
+            <p>This page demonstrates the repository's 1,000-position, one-dimensional stereo dataset and its spatial-invariance learning principle. The underlying Eglen–Bray–Stone paper also studies two-dimensional stereo fields, different stimuli and generalization to unseen patterns. Those results are not demonstrated by this dashboard.</p>
+            <a href="https://github.com/godofecht/Iterative-Disparity-Network/issues/3" target="_blank" rel="noopener noreferrer">Follow the full 2D replication work ↗</a>
+          </div>
+        </div>
+        <div class="paper-citation"><span>RESEARCH BASIS</span><p>Eglen, S. J., Bray, A. J., &amp; Stone, J. V. (1997). <em>Unsupervised discovery of invariances.</em> Network: Computation in Neural Systems, 8, 441–452.</p><a href="https://www.damtp.cam.ac.uk/user/sje30/papers/network97.pdf" target="_blank" rel="noopener noreferrer">Read the paper ↗</a></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><span class="brand-foot">IDN <span>/</span> RESEARCH OBSERVATORY</span><span>Measured. Reproducible. Open.</span><a href="https://github.com/godofecht/Iterative-Disparity-Network" target="_blank" rel="noopener noreferrer">Source repository ↗</a></div></footer>
+</body>
+</html>
