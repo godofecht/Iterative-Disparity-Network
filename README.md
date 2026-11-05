@@ -2,6 +2,14 @@
 
 A reproducible C++17 experiment in **unsupervised stereo-disparity learning** via spatial invariance. This is a repaired, runnable implementation of the repository's original one-dimensional 1,000-position experiment, rather than a claim of reproducing the full two-dimensional benchmark.
 
+## Two-dimensional stereo, unseen patterns and orientation
+
+**[Explore the live 2D Research Lab](https://godofecht.github.io/Iterative-Disparity-Network/2d.html)**. It runs the 1997 paper's two main spatial-invariance demonstrations as independent, deterministic research reconstructions, beyond the original 1D repository:
+
+The **2D stereo experiment** trains a 19–5–1 micro-network on a 120×120 pair of synthetic random-dot stereograms (40×40 shared-weight output field), then applies its frozen weights to an *independently generated* egg-box disparity field. The **2D orientation experiment** trains a separate 26–9–1 network on 600×600 smoothly oriented ellipse textures (120×120 output field), then tests a different texture realization. No ground-truth disparity or orientation is supplied to the learning rule.
+
+The [research2d documentation](research2d/README.md) describes reproducibility, the analytic FFT-gradient, 1000-step CG experiments across three predeclared seeds, independent tests and their limitations. Both experiments run as part of the main GitHub Actions validation and publish measured matrices, checkpoint animations and statistics to the same GitHub Pages observatory. Published 1997 correlations and merits are *reference benchmarks* and are not copied into the measured results.
+
 ## Interactive research observatory
 
 **[Explore the verified CI research dashboard](https://godofecht.github.io/Iterative-Disparity-Network/)** — an interactive GitHub Pages site that is rebuilt from each successful `main` GitHub Actions run. It displays the actual stereo input sequences, evaluation-only ground truth, final learned response, 21 real model checkpoints over 1,000 conjugate-gradient iterations, a live checkpoint slider, hidden-layer activations, training merit, and downloadable CSVs and JSON.

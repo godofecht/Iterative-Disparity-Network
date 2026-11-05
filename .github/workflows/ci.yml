@@ -17,6 +17,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Python for the 2D research experiments
+        if: runner.os == 'Linux'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: research2d/requirements.txt
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
       - name: Build
@@ -35,6 +42,17 @@ jobs:
         run: |
           ./build/DisparityNetwork --left build/image1.csv --right build/image2.csv --reference build/disparity.csv --epochs 1000 --seed 42 --output-dir build/research-results
           python3 tests/check_research_metrics.py build/research-results/predictions.csv build/disparity.csv build/research-results/training_metrics.csv
+      - name: Reproduce 2D stereo, unseen egg-box and feature-orientation experiments
+        if: runner.os == 'Linux'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_SHA: ${{ github.sha }}
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+        run: |
+          python -m pip install --requirement research2d/requirements.txt
+          python -m unittest discover -s research2d -p 'test_*.py' -v
+          python research2d/build_report.py --out build/research-2d-report.json --run-url "$RUN_URL" --commit "$COMMIT_SHA" --epochs 1000 --orientation-epochs 1000 --seeds 42,43,44
       - name: Build and validate live research website from CI outputs
         if: runner.os == 'Linux'
         env:
@@ -42,7 +60,9 @@ jobs:
           COMMIT_SHA: ${{ github.sha }}
         run: |
           python3 scripts/build_site_data.py --input-dir build --site-dir site --out build/site --run-url "$RUN_URL" --commit "$COMMIT_SHA" --epochs 1000 --seed 42
+          cp build/research-2d-report.json build/site/data/experiment2d.json
           node --check site/app.js
+          node --check site/2d.js
           python3 -m unittest discover -s tests -p 'test_site_*.py' -v
       - name: Upload reproducible experiment outputs (Linux)
         if: runner.os == 'Linux'
@@ -50,6 +70,12 @@ jobs:
         with:
           name: disparity-research-results
           path: build/research-results/
+      - name: Upload complete two-dimensional research data (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-two-dimensional
+          path: build/research-2d-report.json
       - name: Upload generated site bundle (Linux)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
