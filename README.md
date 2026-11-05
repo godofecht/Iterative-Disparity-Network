@@ -44,6 +44,12 @@ The R implementation computes the same patch extraction and forward pass **indep
 
 Predictions must agree within 1e-9 absolute error. The GitHub Actions matrix builds and tests Linux, macOS, and Windows; Linux additionally installs R and checks this cross-language parity using the repository's actual data.
 
+## Verified baseline on repository data
+
+The 5 November 2026 CI run on the original 7,000-value left/right images (1,000 stereo patches), with seed 42 and 1,000 Polak–Ribière+ iterations, produced **F = 2.406892828** (from initial **0.009222471354**) and **Pearson r = +0.9572882731** against the *evaluation-only* supplied disparity. The historical `outputs.csv` snapshot has **|r| = 0.9615181** against the same `disparity.csv`; these are related baselines, not identical optimization trajectories or generalization experiments.
+
+GitHub Actions [run 41944098113](https://github.com/godofecht/Iterative-Disparity-Network/actions/runs/41944098113) passed on Linux, macOS, and Windows, with Linux performing an R/C++ cross-check (maximum absolute difference approximately **5e-16**) and an objective/correlation regression assertion. Its **disparity-research-results** artifact contains the numerical predictions, model weights and all per-iteration metrics; it can be downloaded directly from the run. The performance numbers here are for the 1D dataset only.
+
 ## Fidelity and limitations
 
 This repository's original dataset is a **1D sequence of stereo patches**, whereas Eglen et al. (1997) used two-dimensional output lattices, among other differences in architecture, stimulus generation, and smoothing. The repaired 1D experiment tests the fundamental spatial-invariance learning rule, but must **not** be treated as a reproduction of the paper's published 2D correlation or generalization results. Such a replication needs its own 2D random-dot generator, 2D toroidal masks, train/test split, repeated seeds, and preregistered acceptance criteria.
