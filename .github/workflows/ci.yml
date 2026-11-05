@@ -29,4 +29,12 @@ jobs:
           python3 tests/check_r_parity.py build/smoke-results/predictions.csv build/smoke-results/r_predictions.csv
       - name: Research dataset learning benchmark (Linux)
         if: runner.os == 'Linux'
-        run: ./build/DisparityNetwork --left build/image1.csv --right build/image2.csv --reference build/disparity.csv --epochs 200 --output-dir build/research-results
+        run: |
+          ./build/DisparityNetwork --left build/image1.csv --right build/image2.csv --reference build/disparity.csv --epochs 1000 --output-dir build/research-results
+          python3 tests/check_research_metrics.py build/research-results/predictions.csv build/disparity.csv build/research-results/training_metrics.csv
+      - name: Publish reproducible experiment outputs (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: disparity-research-results
+          path: build/research-results/
