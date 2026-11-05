@@ -138,7 +138,9 @@ def run(seed: int = 42, epochs: int = 1000, size: int = 600) -> dict:
                    "train_output": response.ravel().tolist(),
                    "test_output": test_response.ravel().tolist(),
                    "train_orientation": angle.tolist(),
-                   "test_orientation": test_angle.tolist()},
+                   "test_orientation": test_angle.tolist(),
+                   "train_valid": mask.tolist(),
+                   "test_valid": test_mask.tolist()},
         "history": history,
         "weights": result.x.tolist(),
     }
