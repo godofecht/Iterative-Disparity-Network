@@ -42,6 +42,23 @@ class SpatialResearchTests(unittest.TestCase):
             self.assertAlmostEqual(numeric, gradient[index],
                                    delta=5e-5 * (1 + abs(numeric)))
 
+    def test_orientation_network_243_parameter_gradient(self):
+        rng = np.random.default_rng(412)
+        x = np.column_stack((rng.normal(size=(16, 25)), np.ones(16)))
+        model = SpatialModel(x, 4, half_life=1.0, hidden_units=9)
+        weights = SpatialModel.initial_weights(51, features=26, hidden_units=9)
+        _, analytic = model.evaluate(weights)
+        self.assertEqual(analytic.size, 243)
+        step = 1e-5
+        for index in range(weights.size):
+            a = weights.copy()
+            b = weights.copy()
+            a[index] += step
+            b[index] -= step
+            numeric = (model.evaluate(a)[0] - model.evaluate(b)[0]) / (2.0 * step)
+            self.assertAlmostEqual(numeric, analytic[index],
+                                   delta=5e-5 * (1 + abs(numeric)))
+
     def test_ground_truth_never_enters_training_model(self):
         left, right, truth = stimulus("gaussian", 22, 12)
         x = patches(left, right)
