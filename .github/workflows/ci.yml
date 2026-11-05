@@ -1,0 +1,29 @@
+name: Build and validate
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cmake:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Unit tests and real-data smoke test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: R reference parity (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq r-base-core
+          Rscript r_script.R build/image1.csv build/image2.csv build/smoke-results/weights.csv build/smoke-results/r_predictions.csv
+          python3 tests/check_r_parity.py build/smoke-results/predictions.csv build/smoke-results/r_predictions.csv
