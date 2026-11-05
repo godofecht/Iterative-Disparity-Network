@@ -122,7 +122,15 @@
         <div class="orientation-score">
           <div><span>TRAINED-IMAGE PERIODIC R²</span><strong id="orientation-r2-train">—</strong></div>
           <div><span>UNSEEN-IMAGE PERIODIC R²</span><strong id="orientation-r2-test">—</strong></div>
+          <div><span>OPTIMIZED SPATIAL MERIT F</span><strong id="orientation-merit">—</strong></div>
           <p>After training, responses are fitted to <code>a sin(2θ) + b cos(2θ) + c</code> using only eligible training patches; the <em>same fitted coefficients</em> are evaluated on unseen input. This is a post-training diagnostic, not supervision or a classification accuracy.</p>
+        </div>
+        <div class="lab-progress">
+          <div class="lab-progress-top">
+            <div><p class="eyebrow muted">ORIENTATION OPTIMIZATION</p><h3>The spatial merit during learning</h3></div>
+            <p class="plot-caption">Measured F at every accepted conjugate-gradient step, not an interpolated or illustrative trajectory.</p>
+          </div>
+          <canvas id="orientation-learning-plot" width="1160" height="230" role="img" aria-label="Feature orientation experiment merit over training epochs"></canvas>
         </div>
       </div>
     </section>

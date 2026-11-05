@@ -34,15 +34,15 @@ The original study reported orientation learning merit of about 0.9 after 1000 s
 
 Requires Python 3.12 and the pinned NumPy/SciPy versions:
 
-\`\`\`sh
+```sh
 python -m pip install -r research2d/requirements.txt
 python -m unittest discover -s research2d -p 'test_*.py' -v
 python research2d/experiment.py --seed 42 --epochs 1000 --size 120 --out build/stereo-2d.json
 python research2d/orientation.py --seed 42 --epochs 1000 --size 600 --out build/orientation-2d.json
 python research2d/build_report.py --seeds 42,43,44 --epochs 1000 --orientation-epochs 1000 --commit LOCAL --run-url https://github.com/godofecht/Iterative-Disparity-Network/actions --out build/research-2d-report.json
-\`\`\`
+```
 
-GitHub Actions' **Build and validate** workflow rebuilds this research report on every \`main\` push. CI runs all C++ and R tests, then the 2D gradient/stimulus tests and all seeded experiments, and only **after every platform succeeds** publishes the report to GitHub Pages. Download \`research-two-dimensional\` from the matching GitHub Actions run to obtain all experiment arrays and metadata.
+GitHub Actions' **Build and validate** workflow rebuilds this research report on every `main` push. CI runs all C++ and R tests, then the 2D gradient/stimulus tests and all seeded experiments, and only **after every platform succeeds** publishes the report to GitHub Pages. Download `research-two-dimensional` from the matching GitHub Actions run to obtain all experiment arrays and metadata.
 
 ## Scientific limitations
 
