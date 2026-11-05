@@ -2,3 +2,7 @@
 *.o
 a.out
 build/
+build-*/
+results/
+smoke-results/
+.DS_Store
