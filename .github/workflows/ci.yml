@@ -27,3 +27,6 @@ jobs:
           sudo apt-get install -y -qq r-base-core
           Rscript r_script.R build/image1.csv build/image2.csv build/smoke-results/weights.csv build/smoke-results/r_predictions.csv
           python3 tests/check_r_parity.py build/smoke-results/predictions.csv build/smoke-results/r_predictions.csv
+      - name: Research dataset learning benchmark (Linux)
+        if: runner.os == 'Linux'
+        run: ./build/DisparityNetwork --left build/image1.csv --right build/image2.csv --reference build/disparity.csv --epochs 200 --output-dir build/research-results
