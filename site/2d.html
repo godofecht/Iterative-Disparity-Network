@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1018">
+  <meta name="description" content="Verified two-dimensional neural experiments: stereoscopic depth, generalization to unseen egg-box patterns, and learned feature orientation.">
+  <title>2D Invariance Lab · Iterative Disparity Network</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./2d.css">
+  <script src="./2d.js" defer></script>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="./index.html" aria-label="Iterative Disparity Network home">
+        <span class="brand-glyph" aria-hidden="true"><span></span><span></span></span>
+        <span><strong>IDN</strong><small>Research observatory</small></span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="./index.html">1D experiment</a>
+        <a href="#stereo" aria-current="page">2D depth</a>
+        <a href="#orientation">Feature orientation</a>
+        <a href="#validation">Validation</a>
+      </nav>
+      <a class="header-github" href="https://github.com/godofecht/Iterative-Disparity-Network" target="_blank" rel="noopener noreferrer">Source code ↗</a>
+    </div>
+  </header>
+  <main id="top">
+    <section class="wrap lab-hero" aria-labelledby="lab-title">
+      <div class="lab-hero-copy">
+        <p class="eyebrow"><span class="live-dot"></span> EXPERIMENTS 002 &amp; 003 <span class="eyebrow-divider">/</span> SPATIAL INVARIANCE</p>
+        <h1 id="lab-title">Depth is hidden.<br><em>Structure reveals it.</em></h1>
+        <p class="lab-intro">Real, reproducible two-dimensional experiments. One model learns stereo disparity from randomly textured images. A separate model learns a smoothly varying property of oriented ellipses. Neither receives the hidden property as a training target.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#stereo">Explore the stereo experiment ↘</a>
+          <a class="button secondary" href="#orientation">See feature orientation ↗</a>
+        </div>
+        <p id="lab-status" class="source-status" role="status" aria-live="polite">Loading numerical measurements produced by CI…</p>
+      </div>
+      <div class="hero-illustration">
+        <div class="hero-illustration-head"><span>THE OUTPUT IS NOT THE INPUT</span><span>40 × 40</span></div>
+        <canvas id="hero-map" width="340" height="340" role="img" aria-label="Learned two-dimensional disparity response from the measured training run"></canvas>
+        <div class="hero-illustration-foot"><span>LEARNED DEPTH FIELD</span><span>GAUSSIAN STEREO</span></div>
+      </div>
+    </section>
+    <section class="wrap lab-stat-grid" aria-label="Measured two-dimensional experiment metrics">
+      <article><div>TRAINING DEPTH |r|</div><strong id="train-r">—</strong><p>Gaussian stereo surface</p></article>
+      <article><div>HELD-OUT DEPTH |r|</div><strong id="test-r">—</strong><p>New random-dot egg-box</p></article>
+      <article><div>ORIENTATION TRAIN R²</div><strong id="orientation-train">—</strong><p>Post-training periodic fit</p></article>
+      <article><div>ORIENTATION TEST R²</div><strong id="orientation-test">—</strong><p>Same calibration on unseen image</p></article>
+    </section>
+
+    <section id="stereo" class="section wrap lab-section" aria-labelledby="stereo-title">
+      <div class="section-heading">
+        <div><p class="eyebrow muted">01 / UNSUPERVISED STEREO</p><h2 id="stereo-title">A complete two-dimensional depth experiment.</h2></div>
+        <p>Two 120 × 120 views of a 20%-black random-dot texture, subpixel disparities in 0.1-pixel steps, a 40 × 40 output lattice, and a single 19–5–1 micro-network whose weights are shared everywhere.</p>
+      </div>
+      <div class="scenario-bar">
+        <div><span class="scenario-label">STEREO INPUT CASE</span><p>Switch between the learned Gaussian surface and a genuinely unseen egg-box field.</p></div>
+        <div class="segmented" role="group" aria-label="Stereo input scene">
+          <button class="active" id="scene-train" aria-pressed="true" type="button">Training: Gaussian</button>
+          <button id="scene-test" aria-pressed="false" type="button">Unseen: egg-box</button>
+        </div>
+      </div>
+      <div class="heat-grid">
+        <article class="image-card">
+          <div class="image-card-top"><span>01</span><strong>LEFT RETINAL IMAGE</strong><span>120 × 120</span></div>
+          <canvas id="stereo-left" width="240" height="240" role="img" aria-label="Left-eye stereo stimulus rendered from experimental pixels"></canvas>
+          <p>Normalized input grayscale. Not an illustrative reconstruction.</p>
+        </article>
+        <article class="image-card">
+          <div class="image-card-top"><span>02</span><strong>RIGHT RETINAL IMAGE</strong><span>120 × 120</span></div>
+          <canvas id="stereo-right" width="240" height="240" role="img" aria-label="Right-eye stereo stimulus rendered from experimental pixels"></canvas>
+          <p>Right-eye image displaced by the underlying disparity field.</p>
+        </article>
+        <article class="image-card">
+          <div class="image-card-top"><span>03</span><strong>HIDDEN DISPARITY</strong><span>40 × 40</span></div>
+          <canvas id="stereo-target" width="240" height="240" role="img" aria-label="Ground-truth disparity, used only for evaluating learned output"></canvas>
+          <p>Ground truth is isolated from weight optimisation.</p>
+        </article>
+        <article class="image-card selected">
+          <div class="image-card-top"><span>04</span><strong>NETWORK RESPONSE</strong><span>40 × 40</span></div>
+          <canvas id="stereo-output" width="240" height="240" role="img" aria-label="Model-predicted disparity map at selected training checkpoint"></canvas>
+          <p>Actual shared-weight output at the chosen training checkpoint.</p>
+        </article>
+      </div>
+      <div class="colour-explainer"><span class="gradient-bar"></span> Blue / green represents opposite signs of the spatial response. Output maps are standardized and sign-aligned <em>for display only</em>; raw correlations are computed without such transformations.</div>
+      <div class="lab-progress">
+        <div class="lab-progress-top">
+          <div><p class="eyebrow muted">EXPLORE TRAINING</p><h3>Watch the learned field emerge.</h3></div>
+          <div class="lab-progress-stats"><span>Epoch <strong id="epoch-current">—</strong></span><span>F <strong id="epoch-merit">—</strong></span><span>Training |r| <strong id="epoch-train-r">—</strong></span><span>Unseen |r| <strong id="epoch-test-r">—</strong></span></div>
+        </div>
+        <canvas id="stereo-learning-plot" width="1160" height="260" role="img" aria-label="Training merit and evaluation correlations over optimization steps"></canvas>
+        <div class="plot-legend"><span><i class="swatch cyan"></i>Spatial merit F</span><span><i class="swatch amber"></i>Training |r|</span><span><i class="swatch violet"></i>Unseen |r|</span></div>
+        <div class="slider-label"><label for="stereo-epoch">RECORDED NETWORK CHECKPOINT</label><button id="play-2d" disabled type="button">▶ Play learning</button></div>
+        <input type="range" id="stereo-epoch" value="0" min="0" max="0" disabled>
+        <div class="timeline-endpoints"><span>UNTRAINED WEIGHTS</span><span>FINAL WEIGHTS</span></div>
+        <p class="scientific-note">The unseen scene is evaluated after each saved checkpoint, using identical weights but a different random-dot texture and disparity field. It never contributes to the objective or gradient.</p>
+      </div>
+    </section>
+
+    <section id="orientation" class="section lab-orientation" aria-labelledby="orientation-title">
+      <div class="wrap">
+        <div class="section-heading">
+          <div><p class="eyebrow muted">02 / A SECOND INVARIANCE</p><h2 id="orientation-title">The same principle discovers orientation.</h2></div>
+          <p>Here the input is not stereo. It is a 600 × 600 image of randomly sized, smoothly oriented ellipses. A different 26–9–1 network learns on 5 × 5 image patches over a 120 × 120 output lattice.</p>
+        </div>
+        <div class="orientation-nav">
+          <div><strong>FEATURE ORIENTATION</strong><span>2D patterns with an independent unseen test image</span></div>
+          <div class="segmented" role="group" aria-label="Feature orientation scene">
+            <button id="orientation-scene-train" class="active" type="button" aria-pressed="true">Training image</button>
+            <button id="orientation-scene-test" type="button" aria-pressed="false">Unseen image</button>
+          </div>
+        </div>
+        <div class="orientation-grid">
+          <article class="image-card"><div class="image-card-top"><span>01</span><strong>ELLIPSE TEXTURE</strong><span>600 × 600</span></div><canvas id="orientation-input" width="400" height="400" role="img" aria-label="A raster image of oriented random-length ellipses"></canvas><p>Each 12 × 12 region contains a randomly sized ellipse. Its orientation varies smoothly over the field.</p></article>
+          <article class="image-card"><div class="image-card-top"><span>02</span><strong>MEASURED PATCH AXES</strong><span>120 × 120</span></div><canvas id="orientation-axes" width="400" height="400" role="img" aria-label="Measured principal-axis orientation of eligible image patches"></canvas><p>Evaluation-only principal axes. Dark positions are excluded by the paper's ≥5-pixel, roundness &lt;0.2 criterion.</p></article>
+          <article class="image-card selected"><div class="image-card-top"><span>03</span><strong>LEARNED RESPONSE</strong><span>120 × 120</span></div><canvas id="orientation-output" width="400" height="400" role="img" aria-label="Learned orientation-dependent spatial output"></canvas><p>The network is trained solely on spatial invariance. No angles are supplied to the optimizer.</p></article>
+        </div>
+        <div class="orientation-score">
+          <div><span>TRAINED-IMAGE PERIODIC R²</span><strong id="orientation-r2-train">—</strong></div>
+          <div><span>UNSEEN-IMAGE PERIODIC R²</span><strong id="orientation-r2-test">—</strong></div>
+          <p>After training, responses are fitted to <code>a sin(2θ) + b cos(2θ) + c</code> using only eligible training patches; the <em>same fitted coefficients</em> are evaluated on unseen input. This is a post-training diagnostic, not supervision or a classification accuracy.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="validation" class="section wrap lab-section lab-validation" aria-labelledby="validation-title">
+      <div class="section-heading">
+        <div><p class="eyebrow muted">03 / REPLICATION &amp; LIMITS</p><h2 id="validation-title">Evidence, not just a promising screenshot.</h2></div>
+        <p>Three independently initialized runs of each experiment are measured automatically on CI. The site shows every seed, the mean and standard deviation, and the paper's reported values separately.</p>
+      </div>
+      <div class="comparison-grid">
+        <article class="comparison-card">
+          <h3>Stereo generalization across seeds</h3>
+          <p>Absolute Pearson correlation |r| on the Gaussian training surface and independently generated egg-box test pattern.</p>
+          <div id="stereo-seeds" class="seed-table" aria-label="Seed-wise stereo learning results"></div>
+          <p class="comparison-reference">1997 paper: reported sample |r| above 0.92 training, above 0.89 unseen; ten-run means 0.905 training / 0.869 test. The figures here are new measurements, not those values.</p>
+        </article>
+        <article class="comparison-card">
+          <h3>Orientation generalization across seeds</h3>
+          <p>Fraction of output variance explained by a periodic orientation fit, trained as a diagnostic on training patches and applied unchanged to unseen patches.</p>
+          <div id="orientation-seeds" class="seed-table" aria-label="Seed-wise orientation experiment results"></div>
+          <p class="comparison-reference">The 1997 paper reported mean F ≈ 0.903 across 15 orientation runs. Our F and R² are not the same statistic; the original data, random draws and optimizer differ.</p>
+        </article>
+      </div>
+      <div class="methodology-grid">
+        <article><span>LEARNING RULE</span><h3>Spatial invariance</h3><p>Maximise <code>F = log((V + ε)/(U + ε))</code> where U measures local output changes and V measures deviation from the global mean. A toroidal exponential averaging mask has half-life 2 for stereo and 1 for orientation. Gradients are analytic, checked against finite differences, and propagated through tanh units.</p></article>
+        <article><span>GENERALIZATION</span><h3>No reuse of training stimuli</h3><p>The stereo test uses a separate seeded random-dot texture and a different egg-box disparity field. The orientation test uses different random ellipse lengths and texture realization. Test signals are used for scoring and visualization only.</p></article>
+        <article><span>REPLICATION FIDELITY</span><h3>Differences are disclosed</h3><p>Network scale and core learning objective follow the paper, but our high-resolution stimulus synthesis, exact egg-box parametrization, random draws, initial weight distribution and SciPy conjugate-gradient optimizer are reconstructions, not byte-for-byte reproductions of the original experimental program.</p></article>
+      </div>
+      <div class="provenance-panel">
+        <div><span>DATA PROVENANCE</span><h3>Everything visible is rebuilt from CI.</h3><p><a id="2d-run-link" href="https://github.com/godofecht/Iterative-Disparity-Network/actions" target="_blank" rel="noopener noreferrer">Open validated CI run ↗</a> <span id="2d-commit"></span></p></div>
+        <a class="button primary" href="./data/experiment2d.json" download>Download all 2D measurements ↓</a>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><span class="brand-foot">IDN <span>/</span> TWO-DIMENSIONAL RESEARCH</span><span>Measured. Reproducible. Without labels.</span><a href="./index.html">Explore the 1D experiment ↗</a></div></footer>
+</body>
+</html>
