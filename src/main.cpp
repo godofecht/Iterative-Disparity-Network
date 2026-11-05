@@ -50,9 +50,29 @@ int main(int argc, char** argv)
         const auto samples = disparity::make_patches(left, right, stride);
         const disparity::Network model(samples, short_half_life, long_half_life);
         auto weights = disparity::Network::initial_weights(seed);
-        const auto history = model.train(weights, epochs);
-        const auto final = model.evaluate(weights);
         std::filesystem::create_directories(output_dir);
+
+        // Save actual intermediate network outputs. These snapshots, not interpolations,
+        // drive the site's time slider and can be reproduced from the training seed.
+        std::ofstream checkpoints(output_dir + "/checkpoints.csv");
+        if (!checkpoints)
+            throw std::runtime_error("Cannot write disparity checkpoints");
+        checkpoints << std::setprecision(17);
+        auto save_checkpoint = [&](unsigned epoch, const disparity::Weights& current_weights)
+        {
+            const auto values = model.evaluate(current_weights, false).predictions;
+            checkpoints << epoch;
+            for (const double value : values)
+                checkpoints << ',' << value;
+            checkpoints << '\n';
+            if (!checkpoints)
+                throw std::runtime_error("Cannot write disparity checkpoint row");
+        };
+        const auto history = model.train(weights, epochs, save_checkpoint);
+        if (history.back().iteration % 50 != 0 && history.back().iteration != epochs)
+            save_checkpoint(history.back().iteration, weights);
+        checkpoints.close();
+        const auto final = model.evaluate(weights);
         disparity::write_numbers(output_dir + "/weights.csv", "weight",
                                  std::vector<double>(weights.begin(), weights.end()));
         disparity::write_numbers(output_dir + "/predictions.csv", "prediction", final.predictions);

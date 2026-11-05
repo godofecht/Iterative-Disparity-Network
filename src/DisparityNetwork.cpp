@@ -239,7 +239,8 @@ namespace disparity
         return result;
     }
 
-    std::vector<Epoch> Network::train(Weights& weights, unsigned steps) const
+    std::vector<Epoch> Network::train(Weights& weights, unsigned steps,
+                                       const std::function<void(unsigned, const Weights&)>& checkpoint) const
     {
         auto current = evaluate(weights);
         Weights direction = current.gradient;
@@ -247,6 +248,8 @@ namespace disparity
         history.reserve(steps + 1);
         history.push_back({0, current.merit, current.short_variance,
                            current.long_variance, std::sqrt(dot(current.gradient, current.gradient)), 0.0});
+        if (checkpoint)
+            checkpoint(0, weights);
         for (unsigned iteration = 1; iteration <= steps; ++iteration)
         {
             if (dot(current.gradient, current.gradient) < 1e-16)
@@ -287,6 +290,8 @@ namespace disparity
             current = std::move(next);
             history.push_back({iteration, current.merit, current.short_variance,
                                current.long_variance, std::sqrt(dot(current.gradient, current.gradient)), step});
+            if (checkpoint && (iteration % 50 == 0 || iteration == steps))
+                checkpoint(iteration, weights);
         }
         return history;
     }

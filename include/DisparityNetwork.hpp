@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -48,7 +49,8 @@ namespace disparity
                 double long_half_life = 3200.0);
         static Weights initial_weights(std::uint32_t seed);
         Evaluation evaluate(const Weights& weights, bool with_gradient = true) const;
-        std::vector<Epoch> train(Weights& weights, unsigned steps) const;
+        std::vector<Epoch> train(Weights& weights, unsigned steps,
+                                 const std::function<void(unsigned, const Weights&)>& checkpoint = {}) const;
 
     private:
         std::vector<Patch> samples_;
